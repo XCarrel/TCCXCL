@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<siteMap xmlns="http://schemas.microsoft.com/AspNet/SiteMap-File-1.0" >
+    <siteMapNode url="/Default.aspx" title="Accueil"  description="Retour à l'accueil">
+        <siteMapNode url="/About.aspx" title="A propos"  description="Qui sommes-nous ?" />
+        <siteMapNode url="/Contact.aspx" title="Contact"  description="Contact">
+            <siteMapNode url="/Contact.aspx" title="Formulaire"  description="Formulaire" />
+            <siteMapNode url="/Contact.aspx" title="Téléphones"  description="Tel" />
+        </siteMapNode>
+        <siteMapNode url="/Account/Login.aspx" title="Login"  description="Login" />
+    </siteMapNode>
+</siteMap>
