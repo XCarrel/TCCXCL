@@ -81,7 +81,14 @@ namespace TCC
             cmd.Connection = cnx;
             SqlDataReader rdr = cmd.ExecuteReader();
             lblMessage.Visible = true;
-            if (rdr.Read()) System.Diagnostics.Debug.WriteLine ("Retour de la fonction Occupation: "+rdr.GetDouble(0).ToString());
+            try
+            {
+                if (rdr.Read()) System.Diagnostics.Debug.WriteLine("Retour de la fonction Occupation: " + rdr.GetDouble(0).ToString());
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Exception: " + ex.Message);
+            }
             rdr.Close();
 
             // Planning content will be loaded later, when the DataBound event fires
