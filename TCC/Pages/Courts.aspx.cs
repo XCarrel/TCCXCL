@@ -73,17 +73,6 @@ namespace TCC
                     Court1.Rows[r].Cells[c].Controls.Add(btn);
                 }
 
-            // Court occupation: call to stored function
-            SqlConnection cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
-            cnx.Open();
-            SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "select dbo.Occupation(1,getdate(),DATEADD(MONTH,1,GETDATE()));";
-            cmd.Connection = cnx;
-            SqlDataReader rdr = cmd.ExecuteReader();
-            lblMessage.Visible = true;
-            if (rdr.Read()) Console.Write ("Retour de la fonction Occupation: "+rdr.GetDouble(0).ToString());
-            rdr.Close();
-
             // Planning content will be loaded later, when the DataBound event fires
         }
 

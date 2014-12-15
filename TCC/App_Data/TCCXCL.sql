@@ -509,10 +509,15 @@ End
 
 GO
 
--- Functions
-Create Function Occupation(@court int, @sdate datetime, @edate datetime)
-Returns Float
+-- NewUser:		Creates the tccmembership record that will hold the tcc-specific data
+-- Author:		X. Carrel
+-- Date:		Dec 2014
+Create Trigger NewUser
+On Users
+After Insert
 As
 Begin
-	Return 0.5;
+	Insert Into tccmembership (fkuser) Select UserId From inserted;
 End
+
+GO
