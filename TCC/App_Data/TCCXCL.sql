@@ -574,23 +574,23 @@ Begin
 	Set @cid = (Select idCourt From court Where courtName = @court);
 
 	If (@u1 is null or @u2 is null)
-		RAISERROR ('Unknown member',1,1);
+		RAISERROR ('Unknown member',16,1);
 	Else
 		If @cid is null
-			RAISERROR ('Unknown court',1,1);
+			RAISERROR ('Unknown court',16,1);
 		Else
 			if DATEDIFF(DAY,GETDATE(),@moment) <0 
-				RAISERROR ('Date in the past',1,1);
+				RAISERROR ('Date in the past',16,1);
 			Else
 				if DATEDIFF(DAY,GETDATE(),@moment) >15 
-					RAISERROR ('Date too far in the future',1,1);
+					RAISERROR ('Date too far in the future',16,1);
 				Else
 					if exists (Select * from booking  where DATEPART(YEAR,moment)=DATEPART(YEAR,@moment) AND
 															DATEPART(MONTH,moment)=DATEPART(MONTH,@moment) AND
 															DATEPART(DAY,moment)=DATEPART(DAY,@moment) AND
 															DATEPART(HOUR,moment)=DATEPART(HOUR,@moment) AND
 															fkCourt = @cid)
-						RAISERROR ('Court is busy',1,1);
+						RAISERROR ('Court is busy',16,1);
 					Else
 						Insert into booking (moment, fkMadeBy, fkPartner, fkCourt) Values (@moment, @u1, @u2, @cid);
 
