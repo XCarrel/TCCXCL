@@ -75,6 +75,7 @@ CREATE TABLE clubGroup(
 
 CREATE TABLE role(
 	idrole int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	isLeading bit NOT NULL DEFAULT 0,
 	roleDescription varchar(45) NOT NULL);
 
 CREATE TABLE tccmembership(
@@ -85,7 +86,7 @@ CREATE TABLE tccmembership(
 	NPA int,
 	phonenumber varchar(30),
 	email varchar(50),
-	isTeamLeader bit NOT NULL DEFAULT 0,
+	isSiteAdmin bit NOT NULL DEFAULT 0,
 	approved bit NOT NULL DEFAULT 0);
 
 CREATE TABLE NPA(
@@ -312,7 +313,7 @@ GO
 INSERT INTO clubGroup (groupName) VALUES ('Ecoliers'), ('Juniors'), ('Interclubs'), ('Comité');
 GO
 
-INSERT INTO [role] (roleDescription) VALUES ('Président'), ('Entraîneur'), ('Coach'), ('Caissier'), ('Membre');
+INSERT INTO [role] (roleDescription, isLeading) VALUES ('Président',0), ('Entraîneur',1), ('Coach',1), ('Caissier',0), ('Membre',0);
 GO
 
 INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES ((SELECT TOP 1 UserId FROM Users where LastName Like 'A%'),4,5,CURRENT_TIMESTAMP), ((SELECT TOP 1 UserId FROM Users where LastName Like 'E%'),4,5,CURRENT_TIMESTAMP), ((SELECT TOP 1 UserId FROM Users where LastName Like 'D%'),4,5,CURRENT_TIMESTAMP),((SELECT TOP 1 UserId FROM Users where LastName Like 'C%'),4,1,CURRENT_TIMESTAMP), ((SELECT TOP 1 UserId FROM Users where LastName Like 'B%'),4,4,CURRENT_TIMESTAMP);

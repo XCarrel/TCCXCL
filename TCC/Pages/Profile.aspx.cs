@@ -21,7 +21,7 @@ namespace TCC
                 SqlCommand cmd = new SqlCommand();
                 cmd.CommandText = "SELECT UserId, Firstname, LastName, UserName, address1, address2, NPA, city, phonenumber, email " +
                                   "FROM (tccmembership INNER JOIN Users ON fkuser = UserId) INNER JOIN NPA ON NPA = NPAVal " +
-                                  "WHERE Username = '" + getUsername() + "'; ";
+                                  "WHERE Username = '" + Global.getUsername() + "'; ";
 
                 SqlConnection cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
                 cmd.Connection = cnx;
@@ -50,18 +50,6 @@ namespace TCC
             }
         }
 
-        protected string getUsername()
-        {
-            try
-            {
-                return Membership.GetUser().UserName;
-            }
-            catch
-            {
-                return "";
-            }
-        }
-
         protected void TextBoxChanged (object sender, EventArgs e)
         {
             TextBox tb = (TextBox)sender;
@@ -71,19 +59,19 @@ namespace TCC
             switch (tb.ID)
             {
                 case "txtFname" :
-                    cmd.CommandText = "UPDATE Users SET Firstname = '" + tb.Text + "' WHERE UserName = '" + getUsername() + "'; ";
+                    cmd.CommandText = "UPDATE Users SET Firstname = '" + tb.Text + "' WHERE UserName = '" + Global.getUsername() + "'; ";
                     break;
                 case "txtLname" :
-                    cmd.CommandText = "UPDATE Users SET Lastname = '" + tb.Text + "' WHERE UserName = '" + getUsername() + "'; ";
+                    cmd.CommandText = "UPDATE Users SET Lastname = '" + tb.Text + "' WHERE UserName = '" + Global.getUsername() + "'; ";
                     break;
                 case "txtAdr1":
-                    cmd.CommandText = "UPDATE tccmembership SET address1 = '" + tb.Text + "' FROM Users INNER Join tccmembership ON fkUser = Userid WHERE UserName = '" + getUsername() + "'; ";
+                    cmd.CommandText = "UPDATE tccmembership SET address1 = '" + tb.Text + "' FROM Users INNER Join tccmembership ON fkUser = Userid WHERE UserName = '" + Global.getUsername() + "'; ";
                     break;
                 case "txtAdr2":
-                    cmd.CommandText = "UPDATE tccmembership SET address2 = '" + tb.Text + "' FROM Users INNER Join tccmembership ON fkUser = Userid WHERE UserName = '" + getUsername() + "'; ";
+                    cmd.CommandText = "UPDATE tccmembership SET address2 = '" + tb.Text + "' FROM Users INNER Join tccmembership ON fkUser = Userid WHERE UserName = '" + Global.getUsername() + "'; ";
                     break;
                 case "txtNPA":
-                    cmd.CommandText = "UPDATE tccmembership SET NPA = " + tb.Text + " FROM Users INNER Join tccmembership ON fkUser = Userid WHERE UserName = '" + getUsername() + "'; ";
+                    cmd.CommandText = "UPDATE tccmembership SET NPA = " + tb.Text + " FROM Users INNER Join tccmembership ON fkUser = Userid WHERE UserName = '" + Global.getUsername() + "'; ";
                     // There's more to do: update the city name
                     SqlCommand cmd2 = new SqlCommand();
                     cmd2.CommandText = "Select city From NPA Where NPAVal = " + tb.Text;
@@ -93,10 +81,10 @@ namespace TCC
                     rdr.Close();
                     break;
                 case "txtTel":
-                    cmd.CommandText = "UPDATE tccmembership SET phonenumber = '" + tb.Text + "' FROM Users INNER Join tccmembership ON fkUser = Userid WHERE UserName = '" + getUsername() + "'; ";
+                    cmd.CommandText = "UPDATE tccmembership SET phonenumber = '" + tb.Text + "' FROM Users INNER Join tccmembership ON fkUser = Userid WHERE UserName = '" + Global.getUsername() + "'; ";
                     break;
                 case "txtEmail":
-                    cmd.CommandText = "UPDATE tccmembership SET email = '" + tb.Text + "' FROM Users INNER Join tccmembership ON fkUser = Userid WHERE UserName = '" + getUsername() + "'; ";
+                    cmd.CommandText = "UPDATE tccmembership SET email = '" + tb.Text + "' FROM Users INNER Join tccmembership ON fkUser = Userid WHERE UserName = '" + Global.getUsername() + "'; ";
                     break;
             }
             cmd.Connection = cnx;

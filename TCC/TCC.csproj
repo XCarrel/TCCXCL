@@ -132,6 +132,8 @@
   <ItemGroup>
     <Content Include="App_Data\GenerateErrors.sql" />
     <Content Include="App_Data\GenerateResas.sql" />
+    <Content Include="App_Data\Res Ecoliers - erreurs.txt" />
+    <Content Include="App_Data\Res Ecoliers.txt" />
     <Content Include="App_Data\TCCXCL.sql" />
     <Content Include="Pages\About.aspx" />
     <Content Include="Account\Login.aspx" />
@@ -393,7 +395,9 @@
       <DependentUpon>Stats.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Upload\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Account\Web.config" />
     <Content Include="Site.Master" />

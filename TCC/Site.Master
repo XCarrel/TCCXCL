@@ -45,7 +45,6 @@
     <header>
         <div class="content-wrapper">
             <div class="float-right">
-                <span><asp:Label ID="salamalec" runat="server">??</asp:Label></span>
                 <span id="login">
                     <asp:LoginView runat="server" ViewStateMode="Disabled">
                         <AnonymousTemplate>
@@ -67,10 +66,11 @@
                     <ul id="menu">
                         <li><a runat="server" href="~/">Accueil</a></li>
                         <li><a runat="server" href="~/Pages/Courts">Courts</a></li>
-                        <li><asp:HyperLink ID="lnkMembers" runat="server" href="Pages/Members">Membres</asp:HyperLink></li>
-                        <li><asp:HyperLink ID="lnkProfile" runat="server" href="Pages/Profile">Profil</asp:HyperLink></li>
                         <li><a runat="server" href="~/Pages/About">A propos</a></li>
                         <li><a runat="server" href="~/Pages/Contact">Contact</a></li>
+                        <li><asp:HyperLink ID="lnkMembers" visible="false" runat="server" href="/Pages/Members">Membres</asp:HyperLink></li>
+                        <li><asp:HyperLink ID="lnkProfile" visible="false" runat="server" href="/Pages/Profile">Profil</asp:HyperLink></li>
+                        <li><asp:HyperLink ID="lnkBookings" visible="false" runat="server" href="/Pages/Bookings">Réservations d'équipe</asp:HyperLink></li>
                     </ul>
                 </nav>
             </div>

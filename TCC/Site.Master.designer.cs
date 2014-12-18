@@ -31,15 +31,6 @@ namespace TCC {
         protected global::System.Web.UI.ScriptManager ScriptsJS;
         
         /// <summary>
-        /// salamalec control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label salamalec;
-        
-        /// <summary>
         /// lnkMembers control.
         /// </summary>
         /// <remarks>
@@ -56,6 +47,15 @@ namespace TCC {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HyperLink lnkProfile;
+        
+        /// <summary>
+        /// lnkBookings control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HyperLink lnkBookings;
         
         /// <summary>
         /// FeaturedContent control.

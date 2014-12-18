@@ -5,6 +5,9 @@ using System.Web;
 using System.Web.Optimization;
 using System.Web.Routing;
 using System.Web.Security;
+using System.Data.SqlClient;
+using System.Data;
+using System.Configuration;
 using TCC;
 
 namespace TCC
@@ -32,5 +35,63 @@ namespace TCC
             // Code that runs when an unhandled error occurs
 
         }
+
+        static public string getUsername()
+        {
+            try
+            {
+                return Membership.GetUser().UserName;
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        static public string getCurrentUserId()
+        {
+            SqlConnection cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
+            cnx.Open();
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = string.Format("SELECT UserId FROM Users WHERE UserName = '{0}';", getUsername());
+            cmd.Connection = cnx;
+            SqlDataReader rdr = cmd.ExecuteReader();
+            string res = null;
+            if (rdr.Read()) res = rdr.GetSqlGuid(0).ToString();
+            rdr.Close();
+            return res;
+        }
+
+        // Returns true if the user logged in is leader of a team. If he is, the group ID is returned in clubGroup
+        static public bool currentUserIsTeamLeader(out int clubGroup)
+        {
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "SELECT fkGroup FROM ((((tccmembership INNER JOIN Users ON fkuser = UserId) INNER JOIN belongs ON fkMember = UserId) INNER JOIN [role] ON fkRole = idRole) INNER JOIN clubGroup ON fkGroup = idClubGroup) " +
+                              "WHERE Username = '" + getUsername() + "'; ";
+            SqlConnection cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
+            cmd.Connection = cnx;
+            cnx.Open();
+            SqlDataReader rdr = cmd.ExecuteReader();
+            if (rdr.Read()) // found details
+                clubGroup = rdr.GetInt32(0);
+            else
+                clubGroup = -1;
+            return (clubGroup > 0);
+        }
+
+        // Returns true if the user logged in is admin
+        static public bool currentUserIsAdmin()
+        {
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "SELECT isSiteAdmin FROM (tccmembership INNER JOIN Users ON fkuser = UserId) " +
+                              "WHERE Username = '" + getUsername() + "'; ";
+            SqlConnection cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
+            cmd.Connection = cnx;
+            cnx.Open();
+            SqlDataReader rdr = cmd.ExecuteReader();
+            if (rdr.Read()) return rdr.GetBoolean(0);
+            return false;
+        }
+
     }
 }

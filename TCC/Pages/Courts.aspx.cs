@@ -14,21 +14,6 @@ namespace TCC
 {
     public partial class Courts : System.Web.UI.Page
     {
-        private string getCurrentUserId()
-        {
-            SqlConnection cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
-            cnx.Open();
-            SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = string.Format("SELECT UserId FROM Users WHERE UserName = '{0}';",Membership.GetUser().ToString());
-            cmd.Connection = cnx;
-            SqlDataReader rdr = cmd.ExecuteReader();
-            lblMessage.Visible = true;
-            string res = null;
-            if (rdr.Read()) res = rdr.GetSqlGuid(0).ToString();
-            rdr.Close();
-            return res;
-        }
-
         private int ColDay(string sday) // Returns the column number (1-7) for the day passed as string in french
         {
             int ncol = -1;
@@ -236,7 +221,7 @@ namespace TCC
             SqlConnection cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
             cnx.Open();
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = string.Format("INSERT INTO booking (moment, fkMadeBy, fkPartner, guest, fkCourt) VALUES ('{0}','{1}','{2}',null,{3});", moment.ToString("yyyy-MM-d HH:mm"), getCurrentUserId(),dpdPartner.SelectedValue,dpdCourtSelect.SelectedValue);
+            cmd.CommandText = string.Format("INSERT INTO booking (moment, fkMadeBy, fkPartner, guest, fkCourt) VALUES ('{0}','{1}','{2}',null,{3});", moment.ToString("yyyy-MM-d HH:mm"), Global.getCurrentUserId(),dpdPartner.SelectedValue,dpdCourtSelect.SelectedValue);
             cmd.Connection = cnx;
             try
             {

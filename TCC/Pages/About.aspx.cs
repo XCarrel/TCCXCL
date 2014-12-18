@@ -17,6 +17,17 @@ namespace TCC
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            ContentPlaceHolder p = Master.FindControl("MainContent") as ContentPlaceHolder;
+
+            Button dynab = new Button();
+            dynab.Text = "dyn";
+            dynab.Click += dynab_Click;
+            p.Controls.Add(dynab);
+        }
+
+        void dynab_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         protected void dpdCourt_SelectedIndexChanged(object sender, EventArgs e)

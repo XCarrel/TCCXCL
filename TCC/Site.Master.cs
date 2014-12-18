@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Web.Security;
+using System.Data.SqlClient;
+using System.Data;
+using System.Configuration;
 
 namespace TCC
 {
@@ -67,22 +70,14 @@ namespace TCC
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Update the greetings to the time of day
-            if (DateTime.Now.Hour >= 18)
-                salamalec.Text = "Bonsoir";
-            else
-                salamalec.Text = "Bonjour";
+            int gleader;
 
             // Contextual menu
-            string user = "";
-            try {
-                user = Membership.GetUser().UserName;
-                if (!user.Equals("MisterX25")) lnkMembers.Visible = false;
-            }
-            catch
+            if (Global.getUsername() != "") // User logged in
             {
-                lnkProfile.Visible = false;
-                lnkMembers.Visible = false;
+                lnkProfile.Visible = true;
+                if (Global.currentUserIsAdmin()) lnkMembers.Visible = true;
+                if (Global.currentUserIsTeamLeader(out gleader)) lnkBookings.Visible = true;
             }
         }
 
