@@ -85,7 +85,8 @@ CREATE TABLE tccmembership(
 	NPA int,
 	phonenumber varchar(30),
 	email varchar(50),
-	approved int NOT NULL DEFAULT 0);
+	isTeamLeader bit NOT NULL DEFAULT 0,
+	approved bit NOT NULL DEFAULT 0);
 
 CREATE TABLE NPA(
 	NPAVal int NOT NULL PRIMARY KEY,
