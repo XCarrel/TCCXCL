@@ -1,5 +1,12 @@
+-- TCCXCL.sql:	This script creates a database for the TCC (Tennis Club Chavornay) app
+--				The database is initialized with 200 fake members and fake bookings spread out
+--				over 9 weeks.
+-- Version:		1.0
+-- Author:		X. Carrel
+
 USE master
 GO
+SET NOCOUNT ON
 
 -------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
@@ -322,6 +329,62 @@ GO
 INSERT INTO NPA (NPAVal,City) VALUES (1000, 'Lausanne CT'),(1001, 'Lausanne'),(1002, 'Lausanne'),(1003, 'Lausanne'),(1004, 'Lausanne'),(1005, 'Lausanne'),(1006, 'Lausanne'),(1007, 'Lausanne'),(1008, 'Prilly'),(1009, 'Pully'),(1010, 'Lausanne'),(1011, 'Lausanne'),(1012, 'Lausanne'),(1014, 'Lausanne Adm cant'),(1015, 'Lausanne'),(1017, 'Lausanne Veillon'),(1018, 'Lausanne'),(1019, 'Lausanne'),(1020, 'Renens VD'),(1022, 'Chavannes-Renens'),(1023, 'Crissier'),(1024, 'Ecublens VD'),(1025, 'St-Sulpice VD'),(1026, 'Echandens-Denges'),(1027, 'Lonay'),(1028, 'Préverenges'),(1029, 'Villars-Ste-Croix'),(1030, 'Bussigny-Lausanne'),(1031, 'Mex VD'),(1032, 'Romanel-s-Lausanne'),(1033, 'Cheseaux-Lausanne'),(1034, 'Boussens'),(1035, 'Bournens'),(1036, 'Sullens'),(1037, 'Etagniéres'),(1038, 'Bercher'),(1039, 'Cheseaux Polyval'),(1040, 'Echallens'),(1041, 'Dommartin'),(1042, 'Bettens'),(1043, 'Sugnens'),(1044, 'Fey'),(1045, 'Ogens'),(1046, 'Rueyres'),(1047, 'Oppens'),(1052, 'Mont-sur-Lausanne'),(1053, 'Bretigny-Morrens'),(1054, 'Morrens VD'),(1055, 'Froideville'),(1058, 'Villars-Tiercelin'),(1059, 'Peney-le-Jorat'),(1061, 'Villars-Mendraz'),(1062, 'Sottens'),(1063, 'Peyres-Possens'),(1066, 'Epalinges'),(1068, 'Les Monts-de-Pully'),(1070, 'Puidoux'),(1071, 'Chexbres'),(1072, 'Forel (Lavaux)'),(1073, 'Savigny'),(1076, 'Ferlens VD'),(1077, 'Servion'),(1078, 'Essertes'),(1080, 'Les Cullayes'),(1081, 'Montpreveyres'),(1082, 'Corcelles-le-Jorat'),(1083, 'Méziéres VD'),(1084, 'Carrouge VD'),(1085, 'Vulliens'),(1088, 'Ropraz'),(1090, 'La Croix (Lutry)'),(1091, 'Grandvaux'),(1092, 'Belmont-Lausanne'),(1093, 'La Conversion'),(1094, 'Paudex'),(1095, 'Lutry'),(1096, 'Cully'),(1097, 'Riex'),(1098, 'Epesses'),(1110, 'Morges'),(1112, 'Echichens'),(1113, 'St-Saphorin-Morges'),(1114, 'Colombier VD'),(1115, 'Vullierens'),(1116, 'Cottens VD'),(1117, 'Grancy'),(1121, 'Bremblens'),(1122, 'Romanel-sur-Morges'),(1123, 'Aclens'),(1124, 'Gollion'),(1125, 'Monnaz'),(1126, 'Vaux-sur-Morges'),(1127, 'Clarmont'),(1128, 'Reverolle'),(1131, 'Tolochenaz'),(1132, 'Lully VD'),(1134, 'Vufflens-Ch‚teau'),(1135, 'Denens'),(1136, 'Bussy-Chardonney'),(1141, 'Sévery'),(1142, 'Pampigny'),(1143, 'Apples'),(1144, 'Ballens'),(1145, 'Biére'),(1146, 'Mollens VD'),(1147, 'Montricher'),(1148, 'LIsle'),(1149, 'Berolle'),(1162, 'St-Prex'),(1163, 'Etoy'),(1164, 'Buchillon'),(1165, 'Allaman'),(1166, 'Perroy'),(1167, 'Lussy-sur-Morges'),(1168, 'Villars-sous-Yens'),(1169, 'Yens'),(1170, 'Aubonne'),(1172, 'Bougy-Villars'),(1173, 'Féchy'),(1174, 'Montherod'),(1175, 'Lavigny'),(1176, 'St-Livres'),(1180, 'Rolle'),(1182, 'Gilly'),(1183, 'Bursins'),(1184, 'Vinzel'),(1185, 'Mont-sur-Rolle'),(1186, 'Essertines-Rolle'),(1187, 'St-Oyens'),(1188, 'Gimel'),(1189, 'Saubraz'),(1195, 'Dully-Bursinel'),(1196, 'Gland'),(1197, 'Prangins'),(1200, 'Genève'),(1201, 'Genève'),(1202, 'Genève'),(1203, 'Genève'),(1204, 'Genève'),(1205, 'Genève'),(1206, 'Genève'),(1207, 'Genève'),(1208, 'Genève'),(1209, 'Genève'),(1211, 'Genève 1'),(1212, 'Grand-Lancy'),(1213, 'Petit-Lancy'),(1214, 'Vernier'),(1215, 'Genève'),(1216, 'Cointrin'),(1217, 'Meyrin'),(1218, 'Le Grand-Saconnex'),(1219, 'Le Lignon'),(1220, 'Les Avanchets'),(1222, 'Vésenaz'),(1223, 'Cologny'),(1224, 'Chêne-Bougeries'),(1225, 'Chêne-Bourg'),(1226, 'Thonex'),(1227, 'Carouge GE'),(1228, 'Plan-les-Ouates'),(1231, 'Conches'),(1232, 'Confignon'),(1233, 'Bernex'),(1234, 'Vessy'),(1236, 'Cartigny'),(1237, 'Avully'),(1239, 'Collex'),(1240, 'Genève'),(1241, 'Puplinge'),(1242, 'Satigny'),(1243, 'Presinge'),(1244, 'Choulex'),(1245, 'Collonge-Bellerive'),(1246, 'Corsier GE'),(1247, 'Aniéres'),(1248, 'Hermance'),(1251, 'Gy'),(1252, 'Meinier'),(1253, 'Vandoeuvres'),(1254, 'Jussy'),(1255, 'Veyrier'),(1256, 'Troinex'),(1257, 'La Croix-de-Rozon'),(1258, 'Perly'),(1260, 'Nyon'),(1261, 'Marchissy'),(1262, 'Eysins'),(1263, 'Crassier'),(1264, 'St-Cergue'),(1265, 'La Cure'),(1266, 'Duillier'),(1267, 'Vich-Coinsins'),(1268, 'Burtigny'),(1269, 'Bassins'),(1270, 'Trélex'),(1271, 'Givrins'),(1272, 'Genolier'),(1273, 'Le Muids'),(1274, 'Grens'),(1275, 'Chéserex'),(1276, 'Gingins'),(1277, 'Borex'),(1278, 'La Rippe'),(1279, 'Chavannes-de-Bogis'),(1281, 'Russin'),(1283, 'Dardagny'),(1284, 'Chancy'),(1285, 'Athenaz (Avusy)'),(1286, 'Soral'),(1287, 'Laconnex'),(1288, 'Aire-la-Ville'),(1289, 'Genève Serv. Spéc.'),(1290, 'Versoix'),(1291, 'Commugny'),(1292, 'Chambésy'),(1293, 'Bellevue'),(1294, 'Genthod'),(1295, 'Mies-Tannay'),(1296, 'Coppet'),(1297, 'Founex'),(1298, 'Céligny'),(1299, 'Crans-prés-Céligny'),(1300, 'Eclépens CC'),(1302, 'Vufflens-la-Ville'),(1303, 'Penthaz'),(1304, 'Senarclens'),(1305, 'Penthalaz'),(1306, 'Daillens'),(1307, 'Lussery-Villars'),(1308, 'La Chaux-Cossonay'),(1310, 'Daillens Dist Ba'),(1311, 'Eclépens SC'),(1312, 'Eclépens'),(1313, 'Ferreyres'),(1315, 'La Sarraz'),(1316, 'Chevilly'),(1317, 'Orny'),(1318, 'Pompaples'),(1320, 'Daillens ST PP 1'),(1321, 'Arnex-sur-Orbe'),(1322, 'Croy'),(1323, 'RomainmÙtier'),(1324, 'Premier'),(1325, 'Vaulion'),(1326, 'Juriens'),(1329, 'Bretonniéres'),(1330, 'Daillens CALL'),(1337, 'Vallorbe'),(1338, 'Ballaigues'),(1341, 'Orient'),(1342, 'Le Pont'),(1343, 'Les Charbonniéres'),(1344, 'LAbbaye'),(1345, 'Le Lieu'),(1346, 'Les Bioux'),(1347, 'Le Sentier'),(1348, 'Le Brassus'),(1350, 'Orbe'),(1352, 'Agiez'),(1353, 'Bofflens'),(1354, 'Montcherand'),(1355, 'LAbergement'),(1356, 'Les Clées'),(1357, 'Lignerolle'),(1358, 'Valeyres-Rances'),(1372, 'Bavois'),(1373, 'Chavornay'),(1374, 'Corcelles-Chavorn'),(1375, 'Penthéréaz'),(1376, 'Goumoens-la-Ville'),(1377, 'Oulens-Echallens'),(1400, 'Yverdon-les-Bains'),(1401, 'Yverdon-les-Bains'),(1404, 'Cuarny'),(1405, 'Pomy'),(1406, 'Cronay'),(1407, 'Bioley-Magnoux'),(1408, 'Prahins'),(1409, 'Chanéaz'),(1410, 'Thierrens'),(1412, 'Valeyres-Ursins'),(1413, 'Orzens'),(1415, 'Molondin'),(1416, 'Pailly'),(1417, 'Epautheyres'),(1418, 'Vuarrens'),(1420, 'Fiez'),(1421, 'Fontaines-Grandson'),(1422, 'Grandson'),(1423, 'Villars-Burquin'),(1424, 'Champagne'),(1425, 'Onnens VD'),(1426, 'Concise'),(1427, 'Bonvillars'),(1428, 'Mutrux'),(1429, 'Giez'),(1430, 'Orges'),(1431, 'Vugelles-La Mothe'),(1432, 'Belmont-Yverdon'),(1433, 'Suchy'),(1434, 'Ependes VD'),(1435, 'Essert-Pittet'),(1436, 'Treycovagnes'),(1437, 'Suscévaz'),(1438, 'Mathod'),(1439, 'Rances'),(1440, 'Montagny-Chamard'),(1441, 'Valeyres-Montagny'),(1442, 'Montagny-Yverdon'),(1443, 'Champvent'),(1445, 'Vuiteboeuf');
 GO
 
+ALTER TABLE booking  NOCHECK CONSTRAINT CK_bookingdate -- Disable constraint because we will create booking in the past
+GO
+
+Declare @zeday datetime = GETDATE(),
+		@nbdays integer,
+		@nres integer,
+		@court integer,
+		@hour integer,
+		@moment datetime,
+		@nbres integer,
+		@madeBy uniqueidentifier,
+		@partner uniqueidentifier;
+
+Set @zeday = DATEADD(MONTH,-2,@zeday); -- We will create bookings from two months in the past
+Set @zeday = CAST(CAST(DATEPART(YEAR,@zeday) AS varchar) + '-' + CAST(DATEPART(MONTH,@zeday) AS varchar) + '-' + CAST(DATEPART(DAY,@zeday) AS varchar) AS DATETIME);
+
+Set @nbdays = 0;
+While @zeday < DATEADD(WEEK,1,GETDATE()) -- Create bookings up to one week in the future
+Begin
+	Set @nbres = 8 + Round(Rand()*10,0);
+	Set @nres = 0;
+	while @nres < @nbres
+	Begin
+		Set @court = Round(Rand()*2,0) + 1;
+		Set @hour = Round(Rand()*13,0) + 8;
+		Set @moment = DATEADD(HOUR,@hour,@zeday);
+		Begin Try
+			if (Rand() < 0.1) -- Guest only
+				Insert Into booking (moment,guest,fkCourt) Values (@moment,'Invité',@court);
+			else
+			Begin
+				Set @madeBy = (Select Top 1 UserId From Users Order By NEWID());
+				if (Rand() < 0.2) -- Member + Guest
+					Insert Into booking (moment,fkMadeBy,guest,fkCourt) Values (@moment,@madeBy,'Invité',@court);
+				else -- Member + Member
+				Begin
+					Set @partner = (Select Top 1 UserId From Users Order By NEWID());
+					Insert Into booking (moment,fkMadeBy,fkPartner,fkCourt) Values (@moment,@madeBy,@partner,@court);
+				End
+			End
+		End Try
+		Begin catch
+			Print ('Pas de bol');
+		End Catch
+
+		Set @nres=@nres+1;
+	End
+
+	Set @zeday = DATEADD(DAY,1,@zeday);
+	Set @nbdays = @nbdays + 1;
+End
+
+GO
+ALTER TABLE booking  CHECK CONSTRAINT CK_bookingdate  -- Reactivate constraint
+GO
+
 -------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
 -- Triggers
@@ -633,3 +696,4 @@ Begin
 End
 
 GO
+
