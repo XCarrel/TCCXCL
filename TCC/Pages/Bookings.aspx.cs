@@ -180,7 +180,8 @@ namespace TCC
                 SqlConnection cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
                 cmd.Connection = cnx;
                 cnx.Open();
-                cmd.CommandText = string.Format("INSERT INTO booking (moment, fkMadeBy, fkPartner, guest, fkCourt) VALUES ('{0}-{1}-{2} {3}:00','{4}','{5}',null,{6});", From.Year, From.Month, From.Day, hour, Global.getCurrentUserId(), Global.getCurrentUserId(), courtid);
+                // cmd.CommandText = string.Format("INSERT INTO booking (moment, fkMadeBy, fkPartner, guest, fkCourt) VALUES ('{0}-{1}-{2} {3}:00','{4}','{5}',null,{6});", From.Year, From.Month, From.Day, hour, Global.getCurrentUserId(), Global.getCurrentUserId(), courtid);
+                cmd.CommandText = string.Format("exec GroupBooking '{0}',{1},'{2}-{3}-{4} {5}:00'", Global.getUsername(), courtid, From.Year, From.Month, From.Day, hour);
                 try
                 {
                     cmd.ExecuteNonQuery();
