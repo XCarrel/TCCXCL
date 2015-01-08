@@ -62,6 +62,23 @@ namespace TCC
             return res;
         }
 
+        // Returns true if the user logged in is leader of a team. If he is, the group ID is returned in clubGroup
+        static public bool currentUserIsTeamLeader(out int clubGroup)
+        {
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "SELECT fkGroup FROM ((((tccmembership INNER JOIN Users ON fkuser = UserId) INNER JOIN belongs ON fkMember = UserId) INNER JOIN [role] ON fkRole = idRole) INNER JOIN clubGroup ON fkGroup = idClubGroup) " +
+                              "WHERE Username = '" + getUsername() + "'; ";
+            SqlConnection cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
+            cmd.Connection = cnx;
+            cnx.Open();
+            SqlDataReader rdr = cmd.ExecuteReader();
+            if (rdr.Read()) // found details
+                clubGroup = rdr.GetInt32(0);
+            else
+                clubGroup = -1;
+            return (clubGroup > 0);
+        }
+
         // Returns true if the user logged in is admin
         static public bool currentUserIsAdmin()
         {
