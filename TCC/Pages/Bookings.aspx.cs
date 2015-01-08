@@ -158,5 +158,54 @@ namespace TCC
                 }
             }
         }
+
+        protected void cmdCreate_Click(object sender, EventArgs e)
+        {
+            ContentPlaceHolder cnt = this.Master.FindControl("MainContent") as ContentPlaceHolder;
+            DateTime From = CalFrom.SelectedDate;
+            DateTime To = CalTo.SelectedDate;
+            int period = int.Parse(dpdPeriod.SelectedValue);
+            int courtid = int.Parse(dpdCourtSelect.SelectedValue);
+            int hour = int.Parse(dpdHeure.SelectedValue);
+            int nbres = 0;
+            string errorlist = "";
+
+            if (period <= (int)DayOfWeek.Saturday) // weekly booking: move "From" to the first date
+                while ((int)From.DayOfWeek != period) From = From.AddDays(1);
+            // Do it
+            while (From < To)
+            {
+                // Insert
+                SqlCommand cmd = new SqlCommand();
+                SqlConnection cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
+                cmd.Connection = cnx;
+                cnx.Open();
+                cmd.CommandText = string.Format("INSERT INTO booking (moment, fkMadeBy, fkPartner, guest, fkCourt) VALUES ('{0}-{1}-{2} {3}:00','{4}','{5}',null,{6});", From.Year, From.Month, From.Day, hour, Global.getCurrentUserId(), Global.getCurrentUserId(), courtid);
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                    nbres++;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.Write("Error inserting booking (" + cmd.CommandText + "): " + ex.Message);
+                    errorlist += (string.Format("<br>{0:d/M/yyyy HH:mm:ss}",From.AddHours(hour)));
+                }
+
+                // Move to next day
+                if (period <= (int)DayOfWeek.Saturday)
+                    From = From.AddDays(7);// weekly booking
+                else
+                    From = From.AddDays(1);// daily booking
+            }
+
+            // Show results
+            Label errors = new Label();
+            errors.Text = nbres.ToString() + " réservation(s) créée(s).";
+            if (errorlist != "")
+                errors.Text += "<br>Les réservations suivantes n'ont pas pu être créées:<br>" + errorlist;
+            cnt.Controls.Add(errors);
+
+        }
     }
 }
