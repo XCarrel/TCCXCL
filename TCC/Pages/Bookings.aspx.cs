@@ -18,6 +18,8 @@ namespace TCC
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            int gleader;
+            if (!Global.currentUserIsTeamLeader(out gleader)) Server.Transfer("\\Default.aspx");
         }
 
     }
