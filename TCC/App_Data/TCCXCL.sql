@@ -7,6 +7,8 @@
 -- History:
 --			1.1:	- Added function FrequentPlayers
 --					- Added stored procedures InsertDummyRecord and InsertDummyRecords
+--
+--
 
 USE master
 GO
