@@ -77,7 +77,6 @@ namespace TCC
             {
                 lnkProfile.Visible = true;
                 if (Global.currentUserIsAdmin()) lnkMembers.Visible = true;
-                if (Global.currentUserIsTeamLeader(out gleader)) lnkBookings.Visible = true;
             }
         }
 
