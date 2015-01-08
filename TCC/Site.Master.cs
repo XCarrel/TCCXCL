@@ -70,8 +70,6 @@ namespace TCC
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            int gleader;
-
             // Contextual menu
             if (Global.getUsername() != "") // User logged in
             {
