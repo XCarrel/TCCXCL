@@ -63,8 +63,10 @@ namespace TCC
         }
 
         // Returns true if the user logged in is leader of a team. If he is, the group ID is returned in clubGroup
-        static public bool currentUserIsTeamLeader(out int clubGroup)
+        static public bool currentUserIsTeamLeader()
         {
+            int clubGroup;
+
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "SELECT fkGroup FROM ((((tccmembership INNER JOIN Users ON fkuser = UserId) INNER JOIN belongs ON fkMember = UserId) INNER JOIN [role] ON fkRole = idRole) INNER JOIN clubGroup ON fkGroup = idClubGroup) " +
                               "WHERE Username = '" + getUsername() + "'; ";
