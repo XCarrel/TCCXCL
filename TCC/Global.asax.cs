@@ -69,15 +69,20 @@ namespace TCC
 
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "SELECT fkGroup FROM ((((tccmembership INNER JOIN Users ON fkuser = UserId) INNER JOIN belongs ON fkMember = UserId) INNER JOIN [role] ON fkRole = idRole) INNER JOIN clubGroup ON fkGroup = idClubGroup) " +
-                              "WHERE Username = '" + getUsername() + "'; ";
+                              "WHERE isLeading=1 and Username = '" + getUsername() + "'; ";
             SqlConnection cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
             cmd.Connection = cnx;
             cnx.Open();
             SqlDataReader rdr = cmd.ExecuteReader();
-            if (rdr.Read()) // found details
+            try
+            {
+                rdr.Read();
                 clubGroup = rdr.GetInt32(0);
-            else
+            }
+            catch (Exception e)
+            {
                 clubGroup = -1;
+            }
             return (clubGroup > 0);
         }
 
