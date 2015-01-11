@@ -614,11 +614,11 @@ GO
 -- Procedures
 -------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
--- MemberBooking:		Creates a booking involving two members
+-- MemberMemberBooking:	Creates a booking involving two members
 -- Author:				X. Carrel
 -- Date:				Dec 2014
 
-CREATE PROCEDURE MemberBooking (@m1 varchar(45), @m2 varchar(45), @court varchar(45), @moment datetime)
+CREATE PROCEDURE MemberMemberBooking (@m1 varchar(45), @m2 varchar(45), @court varchar(45), @moment datetime)
 AS
 Begin
 	Declare @u1 uniqueidentifier,
@@ -626,7 +626,7 @@ Begin
 			@cid int;
 
 	Set @u1 = (Select UserId From Users Where UserName = @m1);
-	Set @u2 = (Select UserId From Users Where UserName = @m2);
+	Set @u2 = (Select UserId From Users Where LastName = @m2);
 	Set @cid = (Select idCourt From court Where courtName = @court);
 
 	If (@u1 is null or @u2 is null)
@@ -649,6 +649,75 @@ Begin
 						RAISERROR ('Court is busy',16,1);
 					Else
 						Insert into booking (moment, fkMadeBy, fkPartner, fkCourt) Values (@moment, @u1, @u2, @cid);
+
+End
+
+GO
+-- MemberGuestBooking:	Creates a booking involving a member and a guest
+-- Author:				X. Carrel
+-- Date:				Jan 2015
+
+CREATE PROCEDURE MemberGuestBooking (@member varchar(45), @guest varchar(45), @court varchar(45), @moment datetime)
+AS
+Begin
+	Declare @u uniqueidentifier,
+			@cid int;
+
+	Set @u = (Select UserId From Users Where UserName = @member);
+	Set @cid = (Select idCourt From court Where courtName = @court);
+
+	If (@u is null)
+		RAISERROR ('Unknown member',16,1);
+	Else
+		If @cid is null
+			RAISERROR ('Unknown court',16,1);
+		Else
+			if DATEDIFF(DAY,GETDATE(),@moment) <0 
+				RAISERROR ('Date in the past',16,1);
+			Else
+				if DATEDIFF(DAY,GETDATE(),@moment) >15 
+					RAISERROR ('Date too far in the future',16,1);
+				Else
+					if exists (Select * from booking  where DATEPART(YEAR,moment)=DATEPART(YEAR,@moment) AND
+															DATEPART(MONTH,moment)=DATEPART(MONTH,@moment) AND
+															DATEPART(DAY,moment)=DATEPART(DAY,@moment) AND
+															DATEPART(HOUR,moment)=DATEPART(HOUR,@moment) AND
+															fkCourt = @cid)
+						RAISERROR ('Court is busy',16,1);
+					Else
+						Insert into booking (moment, fkMadeBy, guest, fkCourt) Values (@moment, @u, @guest, @cid);
+
+End
+
+GO
+-- GuestBooking:		Creates a booking involving only a guest
+-- Author:				X. Carrel
+-- Date:				Jan 2015
+
+CREATE PROCEDURE GuestBooking (@guest varchar(45), @court varchar(45), @moment datetime)
+AS
+Begin
+	Declare @cid int;
+
+	Set @cid = (Select idCourt From court Where courtName = @court);
+
+	If @cid is null
+		RAISERROR ('Unknown court',16,1);
+	Else
+		if DATEDIFF(DAY,GETDATE(),@moment) <0 
+			RAISERROR ('Date in the past',16,1);
+		Else
+			if DATEDIFF(DAY,GETDATE(),@moment) >15 
+				RAISERROR ('Date too far in the future',16,1);
+			Else
+				if exists (Select * from booking  where DATEPART(YEAR,moment)=DATEPART(YEAR,@moment) AND
+														DATEPART(MONTH,moment)=DATEPART(MONTH,@moment) AND
+														DATEPART(DAY,moment)=DATEPART(DAY,@moment) AND
+														DATEPART(HOUR,moment)=DATEPART(HOUR,@moment) AND
+														fkCourt = @cid)
+					RAISERROR ('Court is busy',16,1);
+				Else
+					Insert into booking (moment, guest, fkCourt) Values (@moment, @guest, @cid);
 
 End
 
