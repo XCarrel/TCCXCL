@@ -797,23 +797,24 @@ AS
 -- Date: January 2015
 Begin
 	if @interval < 0 OR @interval > 6
-		set @interval = 'Invalid interval value'
+		set @interval = 'Invalid interval value' -- Ugly trick to report error: intentional runtime error (bad cast). Have to use it since Raiserror and Try/Catch are not allowed in function
+
 	Declare @tempresult TABLE (Member Varchar(45))
 	Declare @uname varchar(45)
 	Declare @moment datetime
 	Declare @prevuname varchar(45)
 	Declare @prevmoment datetime
 	Declare resalist cursor for
-		Select Lastname as Member, moment from booking INNER JOIN Users ON fkMadeBy = UserId Where moment >= @from And moment <= @to
+		Select Lastname as Member, moment from booking INNER JOIN Users ON fkMadeBy = UserId Where moment >= @from And moment <= @to -- Member who made a booking
 		union
-		Select Lastname as Member, moment from booking INNER JOIN Users ON fkPartner = UserId Where moment >= @from And moment <= @to
+		Select Lastname as Member, moment from booking INNER JOIN Users ON fkPartner = UserId Where moment >= @from And moment <= @to -- Members who partnered in a booking
 
 	Open resalist;
 	Fetch Next From resalist Into @uname, @moment;
 
 	while @@FETCH_STATUS = 0
 	Begin
-		set @prevuname = @uname
+		set @prevuname = @uname -- Save values of previous record for comparison
 		set @prevmoment = @moment
 		-- Move on to next record
 		Fetch Next From resalist Into @uname, @moment;
@@ -822,186 +823,9 @@ Begin
 	End
 	Close resalist;
 	Deallocate resalist;
-	insert into @result select distinct Member from @tempresult
+	insert into @result select distinct Member from @tempresult -- Distinct to remove doubles
 	return 
 End
 
 GO
 
-Create Procedure InsertDummyRecord @TName varchar(50) As
--- Procedure InsertDummyRecord takes the name of a table, builds and
--- executes an insert statement for a single record in that table.
--- It assumes referential and domain constraints are disabled
--- Author: X. Carrel
--- Date: January 2014
-Begin
-	Declare @ColName Varchar(50), @DataType Varchar(50)
-	-- Read the table's fields: all except the identity one (if any)
-	Declare Fields Cursor For
-		select COLUMN_NAME,DATA_TYPE from information_schema.columns
-		where table_name = @TName and COLUMN_NAME not in 
-			(SELECT name AS HasIdentity
-			FROM syscolumns
-			WHERE OBJECT_NAME(id) = @TName
-			AND COLUMNPROPERTY(id, name, 'IsIdentity') = 1)
-	Open Fields
-	
-	Declare @FirstCol int = 1
-	Declare @FieldList as varchar(200) = ''
-	Declare @Values as varchar(1000) = ''
-	Fetch Next From Fields Into @ColName, @DataType -- Initiate the pump
-	While @@FETCH_STATUS = 0
-	Begin
-		If @FirstCol = 1
-		Begin
-			Set @FieldList = '('
-			Set @Values = '('
-		End
-		Else
-		Begin
-			Set @FieldList = @FieldList+','
-			Set @Values = @Values+','
-		End
-		Set @FieldList = @FieldList+@ColName
-		-- Format data values according to column data type
-		If @DataType in ('int','smallint','bigint')
-			Set @Values=@Values+ Convert(varchar,round(rand() * 100,0)) 
-		If @DataType in ('float','double')
-			Set @Values=@Values+ Convert(varchar,rand() * 100)
-		If @DataType in ('varchar','nvarchar','char')
-			Set @Values=@Values+'''dummy'''
-		If @DataType in ('Date','Time','datetime')
-			Set @Values=@Values+''''+Convert(varchar,GETDATE())+''''
-
-		Fetch Next From Fields Into @ColName, @DataType
-		Set @FirstCol = 0
-	End	
-	if @FieldList <> '' -- There are fields we can insert into
-	Begin
-		Declare @InsertSQL nvarchar(1000) = 'Insert Into '+@TName+@FieldList+') Values '+@Values+')'
-		Exec sp_executesql @InsertSQL
-		if @@ERROR <> 0 print @InsertSQL
-	End
-	Else
-		print 'I can''t do anything on table '+@TName
-		
-	-- Cleaning up
-	Close Fields
-	Deallocate Fields
-End
-
-GO
-
-Create Procedure InsertDummyRecords @TName varchar(50), @nb int As
--- Procedure InsertTestData takes the name of a table, builds and
--- executes an insert statement for @nb records in that table.
--- It assumes referential and domain constraints are disabled
--- Author: X. Carrel
--- Date: January 2015
-Begin
-	Declare @ColName Varchar(50), @DataType Varchar(50)
-	-- Read the table's fields: all except the identity one (if any)
-	Declare Fields Scroll Cursor For
-		select COLUMN_NAME,DATA_TYPE from information_schema.columns
-		where table_name = @TName and COLUMN_NAME not in 
-			(SELECT name AS HasIdentity
-			FROM syscolumns
-			WHERE OBJECT_NAME(id) = @TName
-			AND COLUMNPROPERTY(id, name, 'IsIdentity') = 1)
-	Open Fields
-	
-	-- Build the field list
-	Declare @FirstCol int = 1
-	Declare @FieldList as varchar(200) = ''
-	Fetch First From Fields Into @ColName, @DataType -- Initiate the pump
-	While @@FETCH_STATUS = 0
-	Begin
-		If @FirstCol = 1
-			Set @FieldList = '('
-		Else
-			Set @FieldList = @FieldList+','
-		Set @FieldList = @FieldList+@ColName
-		Fetch Next From Fields Into @ColName, @DataType
-		Set @FirstCol = 0
-	End	
-
-	-- Build the VALUES list
-	Declare @Values as varchar(4000) = ''
-	Declare @FirstRec int = 1
-	While @nb > 0
-	Begin
-		Set @FirstCol = 1
-		Fetch First From Fields Into @ColName, @DataType -- rewind the cursor
-		While @@FETCH_STATUS = 0
-		Begin
-			If @FirstCol = 1
-				If @FirstRec = 1
-					Set @Values = '('
-				Else
-					Set @Values = @Values+'),('
-			Else
-				Set @Values = @Values+','
-
-			-- Format data values according to column data type
-			If @DataType in ('int','smallint','bigint')
-				Set @Values=@Values+ Convert(varchar,round(rand() * 100,0)) 
-			If @DataType in ('float','double')
-				Set @Values=@Values+ Convert(varchar,rand() * 100)
-			If @DataType in ('varchar','nvarchar','char')
-				Set @Values=@Values+'''dummy'''
-			If @DataType in ('Date','Time','datetime')
-				Set @Values=@Values+''''+Convert(varchar,GETDATE())+''''
-
-			Fetch Next From Fields Into @ColName, @DataType
-			Set @FirstCol = 0
-		End	
-		Set @FirstRec = 0
-		Set @nb = @nb-1
-	End
-
-	if @FieldList <> '' -- There are fields we can insert into
-	Begin
-		Declare @InsertSQL nvarchar(1000) = 'Insert Into '+@TName+@FieldList+') Values '+@Values+')'
-		Exec sp_executesql @InsertSQL
-		if @@ERROR <> 0 print @InsertSQL
-	End
-	Else
-		print 'I can''t do anything on table '+@TName
-		
-	-- Cleaning up
-	Close Fields
-	Deallocate Fields
-End
-
-/*
-To handle foreign keys, we can use the select query below that describes the constraint
-
-SELECT
-    K_Table = FK.TABLE_NAME,
-    FK_Column = CU.COLUMN_NAME,
-    PK_Table = PK.TABLE_NAME,
-    PK_Column = PT.COLUMN_NAME,
-	PK_Type = i3.DATA_TYPE
-FROM
-    INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS C
-INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS FK
-    ON C.CONSTRAINT_NAME = FK.CONSTRAINT_NAME
-INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS PK
-    ON C.UNIQUE_CONSTRAINT_NAME = PK.CONSTRAINT_NAME
-INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE CU
-    ON C.CONSTRAINT_NAME = CU.CONSTRAINT_NAME
-INNER JOIN (
-            SELECT
-                i1.TABLE_NAME,
-                i2.COLUMN_NAME
-            FROM
-                INFORMATION_SCHEMA.TABLE_CONSTRAINTS i1
-            INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE i2
-                ON i1.CONSTRAINT_NAME = i2.CONSTRAINT_NAME
-            WHERE
-                i1.CONSTRAINT_TYPE = 'PRIMARY KEY'
-           ) PT
-    ON PT.TABLE_NAME = PK.TABLE_NAME
-INNER JOIN INFORMATION_SCHEMA.COLUMNS i3 ON i3.TABLE_NAME = FK.TABLE_NAME AND i3.COLUMN_NAME = CU.COLUMN_NAME
-
-*/
