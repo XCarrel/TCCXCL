@@ -835,8 +835,55 @@ Create Procedure InsertDummyRecord @TName varchar(50) As
 -- It assumes referential and domain constraints are disabled
 -- Author: X. Carrel
 -- Date: January 2015
-BEGIN
-	Declare @sql nvarchar(1000) -- sp-executesql requires SQL statements to be nvarchar
-	set @sql = 'Insert Into ' + @TName + '(unentier, unfloat, unmot, unedate) VALUES (10, 3.14, ''toto'', ''2015-01-01'')'
-	Execute sp_executesql @sql
-END	
+Begin
+	Declare @ColName Varchar(50), @DataType Varchar(50)
+	-- Read the table's fields: all except the identity one (if any)
+	Declare Fields Cursor For
+		select COLUMN_NAME,DATA_TYPE from information_schema.columns
+		where table_name = @TName
+
+	Open Fields
+	
+	Declare @FirstCol int = 1
+	Declare @FieldList as varchar(200) = ''
+	Declare @Values as varchar(1000) = ''
+	Fetch Next From Fields Into @ColName, @DataType -- Initiate the pump
+	While @@FETCH_STATUS = 0
+	Begin
+		If @FirstCol = 1
+		Begin
+			Set @FieldList = '('
+			Set @Values = '('
+		End
+		Else
+		Begin
+			Set @FieldList = @FieldList+','
+			Set @Values = @Values+','
+		End
+		Set @FieldList = @FieldList+@ColName
+		-- Format data values according to column data type
+		If @DataType in ('int','smallint','bigint')
+			Set @Values=@Values+ Convert(varchar,round(rand() * 100,0)) 
+		If @DataType in ('float','double')
+			Set @Values=@Values+ Convert(varchar,rand() * 100)
+		If @DataType in ('varchar','nvarchar','char')
+			Set @Values=@Values+'''dummy'''
+		If @DataType in ('Date','Time','datetime')
+			Set @Values=@Values+''''+Convert(varchar,GETDATE())+''''
+
+		Fetch Next From Fields Into @ColName, @DataType
+		Set @FirstCol = 0
+	End	
+	if @FieldList <> '' -- There are fields we can insert into
+	Begin
+		Declare @InsertSQL nvarchar(1000) = 'Insert Into '+@TName+@FieldList+') Values '+@Values+')'
+		Exec sp_executesql @InsertSQL
+		if @@ERROR <> 0 print @InsertSQL
+	End
+	Else
+		print 'I can''t do anything on table '+@TName
+		
+	-- Cleaning up
+	Close Fields
+	Deallocate Fields
+End
