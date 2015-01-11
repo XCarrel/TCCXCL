@@ -829,3 +829,14 @@ End
 
 GO
 
+Create Procedure InsertDummyRecord @TName varchar(50) As
+-- Procedure InsertDummyRecord takes the name of a table, builds and
+-- executes an insert statement for a single record in that table.
+-- It assumes referential and domain constraints are disabled
+-- Author: X. Carrel
+-- Date: January 2015
+BEGIN
+	Declare @sql nvarchar(1000) -- sp-executesql requires SQL statements to be nvarchar
+	set @sql = 'Insert Into ' + @TName + '(unentier, unfloat, unmot, unedate) VALUES (10, 3.14, ''toto'', ''2015-01-01'')'
+	Execute sp_executesql @sql
+END	
