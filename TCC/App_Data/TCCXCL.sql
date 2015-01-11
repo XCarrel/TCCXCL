@@ -834,7 +834,7 @@ Create Procedure InsertDummyRecord @TName varchar(50) As
 -- executes an insert statement for a single record in that table.
 -- It assumes referential and domain constraints are disabled
 -- Author: X. Carrel
--- Date: January 2015
+-- Date: January 2014
 Begin
 	Declare @ColName Varchar(50), @DataType Varchar(50)
 	-- Read the table's fields: all except the identity one (if any)
@@ -842,7 +842,6 @@ Begin
 		select COLUMN_NAME,DATA_TYPE from information_schema.columns
 		where table_name = @TName and COLUMN_NAME not in 
 			(SELECT name FROM syscolumns WHERE OBJECT_NAME(id) = @TName	AND COLUMNPROPERTY(id, name, 'IsIdentity') = 1)
-
 	Open Fields
 	
 	Declare @FirstCol int = 1
@@ -875,6 +874,89 @@ Begin
 		Fetch Next From Fields Into @ColName, @DataType
 		Set @FirstCol = 0
 	End	
+	if @FieldList <> '' -- There are fields we can insert into
+	Begin
+		Declare @InsertSQL nvarchar(1000) = 'Insert Into '+@TName+@FieldList+') Values '+@Values+')'
+		Exec sp_executesql @InsertSQL
+		if @@ERROR <> 0 print @InsertSQL
+	End
+	Else
+		print 'I can''t do anything on table '+@TName
+		
+	-- Cleaning up
+	Close Fields
+	Deallocate Fields
+End
+
+GO
+
+Create Procedure InsertDummyRecords @TName varchar(50), @nb int As
+-- Procedure InsertTestData takes the name of a table, builds and
+-- executes an insert statement for @nb records in that table.
+-- It assumes referential and domain constraints are disabled
+-- Author: X. Carrel
+-- Date: January 2015
+Begin
+	Declare @ColName Varchar(50), @DataType Varchar(50)
+	-- Read the table's fields: all except the identity one (if any)
+	Declare Fields Scroll Cursor For
+		select COLUMN_NAME,DATA_TYPE from information_schema.columns
+		where table_name = @TName and COLUMN_NAME not in 
+			(SELECT name AS HasIdentity
+			FROM syscolumns
+			WHERE OBJECT_NAME(id) = @TName
+			AND COLUMNPROPERTY(id, name, 'IsIdentity') = 1)
+	Open Fields
+	
+	-- Build the field list
+	Declare @FirstCol int = 1
+	Declare @FieldList as varchar(200) = ''
+	Fetch First From Fields Into @ColName, @DataType -- Initiate the pump
+	While @@FETCH_STATUS = 0
+	Begin
+		If @FirstCol = 1
+			Set @FieldList = '('
+		Else
+			Set @FieldList = @FieldList+','
+		Set @FieldList = @FieldList+@ColName
+		Fetch Next From Fields Into @ColName, @DataType
+		Set @FirstCol = 0
+	End	
+
+	-- Build the VALUES list
+	Declare @Values as varchar(4000) = ''
+	Declare @FirstRec int = 1
+	While @nb > 0
+	Begin
+		Set @FirstCol = 1
+		Fetch First From Fields Into @ColName, @DataType -- rewind the cursor
+		While @@FETCH_STATUS = 0
+		Begin
+			If @FirstCol = 1
+				If @FirstRec = 1
+					Set @Values = '('
+				Else
+					Set @Values = @Values+'),('
+			Else
+				Set @Values = @Values+','
+
+			-- Format data values according to column data type
+			If @DataType in ('int','smallint','bigint')
+				Set @Values=@Values+ Convert(varchar,round(rand() * 100,0)) 
+			If @DataType in ('float','double')
+				Set @Values=@Values+ Convert(varchar,rand() * 100)
+			If @DataType in ('varchar','nvarchar','char')
+				Set @Values=@Values+'''dummy'''
+			If @DataType in ('Date','Time','datetime')
+				Set @Values=@Values+''''+Convert(varchar,GETDATE())+''''
+
+			Fetch Next From Fields Into @ColName, @DataType
+			Set @FirstCol = 0
+		End	
+		Set @FirstRec = 0
+		Set @nb = @nb-1
+	End
+
 	if @FieldList <> '' -- There are fields we can insert into
 	Begin
 		Declare @InsertSQL nvarchar(1000) = 'Insert Into '+@TName+@FieldList+') Values '+@Values+')'
