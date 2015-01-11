@@ -840,7 +840,8 @@ Begin
 	-- Read the table's fields: all except the identity one (if any)
 	Declare Fields Cursor For
 		select COLUMN_NAME,DATA_TYPE from information_schema.columns
-		where table_name = @TName
+		where table_name = @TName and COLUMN_NAME not in 
+			(SELECT name FROM syscolumns WHERE OBJECT_NAME(id) = @TName	AND COLUMNPROPERTY(id, name, 'IsIdentity') = 1)
 
 	Open Fields
 	
