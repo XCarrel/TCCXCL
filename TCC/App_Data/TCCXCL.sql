@@ -797,23 +797,24 @@ AS
 -- Date: January 2015
 Begin
 	if @interval < 0 OR @interval > 6
-		set @interval = 'Invalid interval value'
+		set @interval = 'Invalid interval value' -- Ugly trick to report error: intentional runtime error (bad cast). Have to use it since Raiserror and Try/Catch are not allowed in function
+
 	Declare @tempresult TABLE (Member Varchar(45))
 	Declare @uname varchar(45)
 	Declare @moment datetime
 	Declare @prevuname varchar(45)
 	Declare @prevmoment datetime
 	Declare resalist cursor for
-		Select Lastname as Member, moment from booking INNER JOIN Users ON fkMadeBy = UserId Where moment >= @from And moment <= @to
+		Select Lastname as Member, moment from booking INNER JOIN Users ON fkMadeBy = UserId Where moment >= @from And moment <= @to -- Member who made a booking
 		union
-		Select Lastname as Member, moment from booking INNER JOIN Users ON fkPartner = UserId Where moment >= @from And moment <= @to
+		Select Lastname as Member, moment from booking INNER JOIN Users ON fkPartner = UserId Where moment >= @from And moment <= @to -- Members who partnered in a booking
 
 	Open resalist;
 	Fetch Next From resalist Into @uname, @moment;
 
 	while @@FETCH_STATUS = 0
 	Begin
-		set @prevuname = @uname
+		set @prevuname = @uname -- Save values of previous record for comparison
 		set @prevmoment = @moment
 		-- Move on to next record
 		Fetch Next From resalist Into @uname, @moment;
@@ -822,7 +823,7 @@ Begin
 	End
 	Close resalist;
 	Deallocate resalist;
-	insert into @result select distinct Member from @tempresult
+	insert into @result select distinct Member from @tempresult -- Distinct to remove doubles
 	return 
 End
 
@@ -840,10 +841,7 @@ Begin
 	Declare Fields Cursor For
 		select COLUMN_NAME,DATA_TYPE from information_schema.columns
 		where table_name = @TName and COLUMN_NAME not in 
-			(SELECT name AS HasIdentity
-			FROM syscolumns
-			WHERE OBJECT_NAME(id) = @TName
-			AND COLUMNPROPERTY(id, name, 'IsIdentity') = 1)
+			(SELECT name FROM syscolumns WHERE OBJECT_NAME(id) = @TName	AND COLUMNPROPERTY(id, name, 'IsIdentity') = 1)
 	Open Fields
 	
 	Declare @FirstCol int = 1
@@ -972,36 +970,3 @@ Begin
 	Close Fields
 	Deallocate Fields
 End
-
-/*
-To handle foreign keys, we can use the select query below that describes the constraint
-
-SELECT
-    K_Table = FK.TABLE_NAME,
-    FK_Column = CU.COLUMN_NAME,
-    PK_Table = PK.TABLE_NAME,
-    PK_Column = PT.COLUMN_NAME,
-	PK_Type = i3.DATA_TYPE
-FROM
-    INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS C
-INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS FK
-    ON C.CONSTRAINT_NAME = FK.CONSTRAINT_NAME
-INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS PK
-    ON C.UNIQUE_CONSTRAINT_NAME = PK.CONSTRAINT_NAME
-INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE CU
-    ON C.CONSTRAINT_NAME = CU.CONSTRAINT_NAME
-INNER JOIN (
-            SELECT
-                i1.TABLE_NAME,
-                i2.COLUMN_NAME
-            FROM
-                INFORMATION_SCHEMA.TABLE_CONSTRAINTS i1
-            INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE i2
-                ON i1.CONSTRAINT_NAME = i2.CONSTRAINT_NAME
-            WHERE
-                i1.CONSTRAINT_TYPE = 'PRIMARY KEY'
-           ) PT
-    ON PT.TABLE_NAME = PK.TABLE_NAME
-INNER JOIN INFORMATION_SCHEMA.COLUMNS i3 ON i3.TABLE_NAME = FK.TABLE_NAME AND i3.COLUMN_NAME = CU.COLUMN_NAME
-
-*/
