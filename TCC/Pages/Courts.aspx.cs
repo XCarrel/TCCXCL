@@ -101,26 +101,55 @@ namespace TCC
         }
         void btn_Click(object sender, EventArgs e)
         {
+            SqlConnection cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
+            cnx.Open();
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = cnx;
+
             Button btn = (Button)sender;
-            if (string.IsNullOrEmpty(btn.Text))
-                if (string.IsNullOrEmpty(txtPlayer.Text))
+            // Compute date/time represented by the button clicked
+            int btime = int.Parse(btn.ID.Substring(1,2))+7;
+            DateTime startDate = DateTime.Now; // current datetime
+            while (startDate.DayOfWeek != DayOfWeek.Monday) startDate = startDate.AddDays(-1);
+            DateTime bdate = startDate.AddDays(double.Parse(btn.ID.Substring(3,1))-1);
+
+            if (string.IsNullOrEmpty(btn.Text)) // Court is free -> user wants to make a booking
+                try // making a booking
                 {
-                    lblMessage.Text = "Veuillez introduire un nom de joueur";
-                    lblMessage.ForeColor = System.Drawing.Color.Red;
+                    if (!string.IsNullOrEmpty(dpdPartner.SelectedItem.ToString())) // with another member
+                    {
+                        cmd.CommandText = string.Format("EXEC MemberMemberBooking '{0}','{1}','{2}','{3}-{4}-{5} {6}:00'", Global.getUsername(), dpdPartner.SelectedItem.ToString(), dpdCourtSelect.SelectedItem.ToString(), bdate.Year, bdate.Month, bdate.Day, btime);
+                        cmd.ExecuteNonQuery();
+                        lblMessage.Text = "Ajouté la réservation avec " + dpdPartner.SelectedValue ;
+                        lblMessage.ForeColor = System.Drawing.Color.Green;
+                        btn.Text = Global.getUsername();
+                    }
+                    else
+                        if (!string.IsNullOrEmpty(txtPlayer.Text)) // with a guest
+                        {
+                            cmd.CommandText = string.Format("EXEC MemberGuestBooking '{0}','{1}','{2}','{3}-{4}-{5} {6}:00'", Global.getUsername(), txtPlayer.Text, dpdCourtSelect.SelectedItem.ToString(), bdate.Year, bdate.Month, bdate.Day, btime);
+                            cmd.ExecuteNonQuery();
+                            lblMessage.Text = "Ajouté la réservation avec l'invité " + txtPlayer.Text;
+                            lblMessage.ForeColor = System.Drawing.Color.Green;
+                            txtPlayer.Text = "";
+                        }
+                        else
+                        {
+                            lblMessage.Text = "Veuillez introduire un nom de joueur";
+                            lblMessage.ForeColor = System.Drawing.Color.Red;
+                        }
                 }
-                else
+                catch (Exception ex)
                 {
-                    lblMessage.Text = "Ajouté la réservation pour " + txtPlayer.Text;
-                    lblMessage.ForeColor = System.Drawing.Color.Green;
-                    btn.Text = txtPlayer.Text;
-                    txtPlayer.Text = "";
+                    System.Diagnostics.Debug.WriteLine("### Exception: "+ex.Message+ " in query " + cmd.CommandText);
                 }
             else
             {
                 lblMessage.Text = "Supprimé la réservation de " + btn.Text;
-                lblMessage.ForeColor = System.Drawing.Color.Green;
+                lblMessage.ForeColor = System.Drawing.Color.Transparent;
                 btn.Text = "";
             }
+                
             lblMessage.Visible = true;
         }
 
