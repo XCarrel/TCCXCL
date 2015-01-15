@@ -15,6 +15,8 @@ namespace TCC.Pages
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            ContentPlaceHolder content = Master.FindControl("MainContent") as ContentPlaceHolder; // In case we want to add controls at runtime
+
             Mydenticon.setName(Global.getUsername());
             string[] names = {"Pierre","Paul","Jean","Luc","Jacques","Sabrina","Brigitte"};
             foreach (string name in names)
