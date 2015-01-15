@@ -141,6 +141,7 @@
     <Content Include="App_Data\Res Ecoliers - erreurs.txt" />
     <Content Include="App_Data\Res Ecoliers.txt" />
     <Content Include="App_Data\TCCXCL.sql" />
+    <Content Include="Mydenticon.ascx" />
     <Content Include="Pages\About.aspx" />
     <Content Include="Account\Login.aspx" />
     <Content Include="Account\Manage.aspx" />
@@ -277,6 +278,13 @@
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\AuthConfig.cs" />
+    <Compile Include="Mydenticon.ascx.cs">
+      <DependentUpon>Mydenticon.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Mydenticon.ascx.designer.cs">
+      <DependentUpon>Mydenticon.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Pages\About.aspx.cs">
       <DependentUpon>About.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
