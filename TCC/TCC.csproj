@@ -219,6 +219,7 @@
     <Content Include="packages.config" />
     <Content Include="Pages\Courts.aspx" />
     <Content Include="Pages\Bookings.aspx" />
+    <Content Include="Pages\Friends.aspx" />
     <Content Include="Pages\Members.aspx" />
     <Content Include="Pages\Profile.aspx" />
     <Content Include="Pages\Admin.aspx" />
@@ -329,6 +330,13 @@
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Friends.aspx.cs">
+      <DependentUpon>Friends.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\Friends.aspx.designer.cs">
+      <DependentUpon>Friends.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
