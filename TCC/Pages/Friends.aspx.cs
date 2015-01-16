@@ -6,6 +6,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using Devcorner.NIdenticon;
 using System.IO;
+using System.Drawing;
 
 namespace TCC.Pages
 {
@@ -18,10 +19,10 @@ namespace TCC.Pages
             lblUname.Text = Global.getUsername();
 
             // Generate ideticon
-            System.Drawing.Size isize = new System.Drawing.Size(32, 32);
-            System.Drawing.Size iblocks = new System.Drawing.Size(6, 6);
-            Devcorner.NIdenticon.BrushGenerators.IBrushGenerator ibrush = new Devcorner.NIdenticon.BrushGenerators.StaticColorBrushGenerator(System.Drawing.Color.Black);
-            System.Drawing.Bitmap mybitmap = (new IdenticonGenerator()).Create(lblUname.Text, isize, System.Drawing.Color.Transparent, iblocks, System.Text.Encoding.Default, IdenticonGenerator.ExtendedBlockGeneratorsConfig, ibrush);
+            Size isize = new Size(32, 32);
+            Size iblocks = new Size(6, 6);
+            Devcorner.NIdenticon.BrushGenerators.IBrushGenerator ibrush = new Devcorner.NIdenticon.BrushGenerators.StaticColorBrushGenerator(Color.Black);
+            Bitmap mybitmap = (new IdenticonGenerator()).Create(lblUname.Text, isize, Color.Transparent, iblocks, System.Text.Encoding.Default, IdenticonGenerator.ExtendedBlockGeneratorsConfig, ibrush);
 
             // Load it into the control
             MemoryStream ms = new MemoryStream();
