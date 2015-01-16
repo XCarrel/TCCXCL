@@ -62,6 +62,20 @@ namespace TCC
             return res;
         }
 
+        static public string getUserId(string uname)
+        {
+            SqlConnection cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
+            cnx.Open();
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = string.Format("SELECT UserId FROM Users WHERE UserName = '{0}';", uname);
+            cmd.Connection = cnx;
+            SqlDataReader rdr = cmd.ExecuteReader();
+            string res = null;
+            if (rdr.Read()) res = rdr.GetSqlGuid(0).ToString();
+            rdr.Close();
+            return res;
+        }
+
         // Returns true if the user logged in is leader of a team. If he is, the group ID is returned in clubGroup
         static public bool currentUserIsTeamLeader(out int clubGroup)
         {

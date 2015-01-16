@@ -6,6 +6,10 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using Devcorner.NIdenticon;
 using System.IO;
+using System.Data.SqlClient;
+using System.Web.Security;
+using System.Configuration;
+
 
 namespace TCC
 {
@@ -30,9 +34,29 @@ namespace TCC
             pctIdenticon.Border = 1;
         }
 
-        public void setName (string n)
+        public void setUsernameName (string Uname)
         {
-            lblUName.Text = n;
+            lblUName.Text = Uname;
+            string uid = Global.getUserId(Uname);
+            // Find last game
+            SqlConnection cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
+            cnx.Open();
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = string.Format("SELECT moment, courtName FROM booking INNER JOIN court ON fkCourt = idcourt WHERE fkMadeBy={0} OR fkPartner={0} ORDER BY moment DESC;", Uname);
+            cmd.Connection = cnx;
+            SqlDataReader rdr = cmd.ExecuteReader();
+            string court = null;
+            DateTime moment;
+            if (rdr.Read())
+            {
+                moment = rdr.GetDateTime(0);
+                court = rdr.GetString(1);
+                lblLastGame.Text = string.Format("{0}, court {1}", moment, court);
+            }
+            rdr.Close();
+            
+            // Show it
+
         }
     }
 }
