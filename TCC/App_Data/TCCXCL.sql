@@ -1048,5 +1048,12 @@ EXEC sp_addrolemember 'TCCAdmin', 'Averell';
 EXEC sp_addrolemember 'db_datareader', 'TCCAdmin';
 EXEC sp_addrolemember 'db_datawriter', 'TCCAdmin';
 
+-- Customize certain users
+DENY UPDATE, DELETE, INSERT ON court TO Averell
+DENY UPDATE, DELETE, INSERT ON Users TO Averell
+GRANT UPDATE ON Users (FirstName, LastName) TO Averell
 
+GRANT CREATE VIEW TO William
+
+EXEC sp_addrolemember 'db_owner', 'Joe';
 
