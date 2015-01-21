@@ -1025,7 +1025,7 @@ GRANT SELECT ON BookingsForGuests to TCCguest
 
 -- Create a TCC Admin login for db content management
 
-CREATE LOGIN TCCAdmin WITH PASSWORD = 'change-me', DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON;
+CREATE LOGIN TCCAdmin WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
 CREATE USER TCCAdmin FOR LOGIN TCCAdmin;
 EXEC sp_addrolemember 'db_datareader', 'TCCAdmin';
 EXEC sp_addrolemember 'db_datawriter', 'TCCAdmin';
