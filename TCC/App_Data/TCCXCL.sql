@@ -1012,4 +1012,14 @@ CREATE LOGIN guest WITH PASSWORD = 'guest', DEFAULT_DATABASE = TCCXCL, CHECK_POL
 CREATE USER TCCguest FOR LOGIN guest;
 GRANT SELECT ON court TO TCCguest;
 GRANT SELECT ON booking TO TCCguest;
+GO
+
+-- Create a view so that guests can see the names associated to bookings
+Create View BookingsForGuests AS
+	Select Lastname as Member, moment, courtName from booking INNER JOIN Users ON fkMadeBy = UserId INNER JOIN court ON fkCourt = idcourt
+		union
+	Select Lastname as Member, moment, courtName from booking INNER JOIN Users ON fkPartner = UserId INNER JOIN court ON fkCourt = idcourt
+
+GO
+GRANT SELECT ON BookingsForGuests to TCCguest
 
