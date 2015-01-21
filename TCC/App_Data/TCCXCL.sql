@@ -1001,3 +1001,15 @@ End
 Close Logins
 Deallocate Logins
 GO
+
+-- Create a guest login
+-- Guests can only select from court and bookings
+
+Use TCCXCL
+GO
+
+CREATE LOGIN guest WITH PASSWORD = 'guest', DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF;
+CREATE USER TCCguest FOR LOGIN guest;
+GRANT SELECT ON court TO TCCguest;
+GRANT SELECT ON booking TO TCCguest;
+
