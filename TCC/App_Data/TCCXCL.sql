@@ -970,3 +970,34 @@ Begin
 	Close Fields
 	Deallocate Fields
 End
+GO
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+-- Security
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+
+Use Master
+GO
+
+-- Eliminate all WINDOWS and SQL logins
+
+Declare @lname varchar(50)
+Declare @sql nvarchar(50)
+Declare Logins cursor for
+	SELECT name FROM sys.server_principals
+	WHERE (type_desc = 'SQL_LOGIN' AND name not like '##%' AND name <> 'sa') -- SQL logins, save system ones
+	   OR (type_desc = 'WINDOWS_LOGIN' AND name not like 'NT %')-- Windows logins, save system ones
+
+Open Logins
+Fetch Next From Logins Into @lname
+While @@FETCH_STATUS = 0
+Begin
+	set @sql = 'DROP LOGIN [' + @lname + ']' -- Brackets in case there are special chars in the name
+	EXEC sp_executesql @sql
+	print ('Destroyed Login ' + @lname + ' ('+@sql + ')')
+	Fetch Next From Logins Into @lname
+End
+Close Logins
+Deallocate Logins
+GO
