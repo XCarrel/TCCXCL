@@ -1023,10 +1023,28 @@ Create View BookingsForGuests AS
 GO
 GRANT SELECT ON BookingsForGuests to TCCguest
 
--- Create a TCC Admin login for db content management
+-- Create individual logins for multiple TCCAdmins
+CREATE LOGIN Joe WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
+CREATE LOGIN Jack WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
+CREATE LOGIN William WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
+CREATE LOGIN Averell WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
 
-CREATE LOGIN TCCAdmin WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
-CREATE USER TCCAdmin FOR LOGIN TCCAdmin;
+-- Create users
+CREATE USER Joe FOR LOGIN Joe;
+CREATE USER Jack FOR LOGIN Jack;
+CREATE USER William FOR LOGIN William;
+CREATE USER Averell FOR LOGIN Averell;
+
+-- Create a role
+CREATE ROLE TCCAdmin
+
+-- Add users in the role
+EXEC sp_addrolemember 'TCCAdmin', 'Joe';
+EXEC sp_addrolemember 'TCCAdmin', 'Jack';
+EXEC sp_addrolemember 'TCCAdmin', 'William';
+EXEC sp_addrolemember 'TCCAdmin', 'Averell';
+
+-- Grant permissions to role
 EXEC sp_addrolemember 'db_datareader', 'TCCAdmin';
 EXEC sp_addrolemember 'db_datawriter', 'TCCAdmin';
 
