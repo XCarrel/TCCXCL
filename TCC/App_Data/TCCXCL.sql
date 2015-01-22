@@ -314,13 +314,16 @@ GO
 INSERT INTO court (courtName) VALUES ('Central'), ('Numéro 1'), ('Numéro 2');
 GO
 
-INSERT INTO clubGroup (groupName, maxResp) VALUES ('Ecoliers',1), ('Juniors',1), ('Interclubs',3), ('Comité',2);
+INSERT INTO clubGroup (groupName, maxResp) VALUES ('Ecoliers',5), ('Juniors',1), ('Interclubs',3), ('Comité',2), ('Seniors', 5);
 GO
 
 INSERT INTO [role] (roleDescription, isLeading) VALUES ('Président',0), ('Entraîneur',1), ('Coach',1), ('Caissier',0), ('Membre',0);
 GO
 
 INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES 
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),1,2,CURRENT_TIMESTAMP), -- Ecoliers/Entraîneur
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),1,2,CURRENT_TIMESTAMP), -- Ecoliers/Entraîneur
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),1,2,CURRENT_TIMESTAMP), -- Ecoliers/Entraîneur
 		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),4,5,CURRENT_TIMESTAMP), -- Comité/Membre
 		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),4,5,CURRENT_TIMESTAMP), -- Comité/Membre 
 		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),4,5,CURRENT_TIMESTAMP), -- Comité/Membre
@@ -984,6 +987,100 @@ Begin
 	Deallocate Fields
 End
 
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+-- Security
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+GO
+
+Use Master
+GO
+
+-- Eliminate all WINDOWS and SQL logins
+
+Declare @lname varchar(50)
+Declare @sql nvarchar(50)
+Declare Logins cursor for
+	SELECT name FROM sys.server_principals
+	WHERE (type_desc = 'SQL_LOGIN' AND name not like '##%' AND name <> 'sa') -- SQL logins, save system ones
+	   OR (type_desc = 'WINDOWS_LOGIN' AND name not like 'NT %')-- Windows logins, save system ones
+
+Open Logins
+Fetch Next From Logins Into @lname
+While @@FETCH_STATUS = 0
+Begin
+	set @sql = 'DROP LOGIN [' + @lname + ']' -- Brackets in case there are special chars in the name
+	EXEC sp_executesql @sql
+	Fetch Next From Logins Into @lname
+End
+Close Logins
+Deallocate Logins
+GO
+
+-- Create a guest login
+-- Guests can only select from court and bookings
+
+Use TCCXCL
+GO
+
+CREATE LOGIN guest WITH PASSWORD = 'guest', DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF;
+CREATE USER TCCguest FOR LOGIN guest;
+GRANT SELECT ON court TO TCCguest;
+GRANT SELECT ON booking TO TCCguest;
+GO
+
+-- Create a view so that guests can see the names associated to bookings
+Create View BookingsForGuests AS
+	Select Lastname as Member, moment, courtName from booking INNER JOIN Users ON fkMadeBy = UserId INNER JOIN court ON fkCourt = idcourt
+		union
+	Select Lastname as Member, moment, courtName from booking INNER JOIN Users ON fkPartner = UserId INNER JOIN court ON fkCourt = idcourt
+
+GO
+GRANT SELECT ON BookingsForGuests to TCCguest
+
+-- Create individual logins for multiple TCCAdmins
+CREATE LOGIN Joe WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
+CREATE LOGIN Jack WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
+CREATE LOGIN William WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
+CREATE LOGIN Averell WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
+
+-- Create users
+CREATE USER Joe FOR LOGIN Joe;
+CREATE USER Jack FOR LOGIN Jack;
+CREATE USER William FOR LOGIN William;
+CREATE USER Averell FOR LOGIN Averell;
+
+-- Create a role
+CREATE ROLE TCCAdmin
+
+-- Add users in the role
+EXEC sp_addrolemember 'TCCAdmin', 'Joe';
+EXEC sp_addrolemember 'TCCAdmin', 'Jack';
+EXEC sp_addrolemember 'TCCAdmin', 'William';
+EXEC sp_addrolemember 'TCCAdmin', 'Averell';
+
+-- Grant permissions to role
+EXEC sp_addrolemember 'db_datareader', 'TCCAdmin';
+EXEC sp_addrolemember 'db_datawriter', 'TCCAdmin';
+
+-- Customize certain users
+DENY UPDATE, DELETE, INSERT ON court TO Averell
+DENY UPDATE, DELETE, INSERT ON Users TO Averell
+GRANT UPDATE ON Users (FirstName, LastName) TO Averell
+
+GRANT CREATE VIEW TO William
+GRANT ALTER ON SCHEMA::dbo TO William
+
+EXEC sp_addrolemember 'db_owner', 'Joe';
+
+-- Create Login/User for the application
+CREATE LOGIN TCCApp WITH PASSWORD = '1q2w3e4r', DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF ;
+CREATE USER TCCApp FOR LOGIN TCCApp;
+EXEC sp_addrolemember 'db_datareader', 'TCCApp';
+EXEC sp_addrolemember 'db_datawriter', 'TCCApp';
+
+
 GO
 -- Epreuve
 
@@ -1007,7 +1104,6 @@ Begin
 					   inner join role on fkRole=idrole
 				GROUP BY idclubGroup,isLeading
 				HAVING idclubGroup = @gid AND isLeading = 1);
-
 	return @nb
 End
 
@@ -1058,25 +1154,7 @@ Begin
 	declare @groupName varchar(45);
 	set @groupName = (select groupName from inserted);
 
-	declare @sql nvarchar(50) = 'CREATE ROLE '+@groupname
-	EXEC sp_executesql @sql
-	
-End
-
-GO
-
-CREATE Trigger NewResp
-ON belongs
-AFTER INSERT
-AS
-Begin
-	declare @groupName varchar(45) = (select groupName from (inserted inner join clubgroup on fkGroup=idclubGroup) inner join role on fkRole = idrole where isLeading = 1);
-	if @groupName is null return;
-
-	declare @username varchar(45) = (select userName from inserted inner join Users on fkMember = UserId);
-
-	declare @sql nvarchar(50);
-	set @sql = 'CREATE LOGIN '+@username + ' WITH Password=pa$$w0rd MUST_CHANGE, '
+	declare @sql nvarchar(50) = 'CREATE ROLE '+@groupname+'Admin'
 	EXEC sp_executesql @sql
 	
 End
@@ -1088,20 +1166,56 @@ GO
 Print '-------------------------------------------------------'
 Print '------------------   Evaluation   ---------------------'
 Print '-------------------------------------------------------'
+Use TCCXCL
+GO
 Declare @Nbpts int = 0
-Declare @NbMaxpts int = 40
+Declare @NbMaxpts int = 20
+Declare @oneguy uniqueidentifier = (select Top 1 UserId from Users order by newid()) 
 Declare @OID int
 SET NOCOUNT ON
+
+-- Qualité du code source
+Set @Nbpts = 3
+Print 'Qualité du code source                   '+ cast(@Nbpts as varchar(1)) + 'pts'
+
 -- Exo 1
 Set @OID = (select object_id from sys.objects where type = 'FN' and name='NbResp')
 if @OID is not null
 Begin
 	-- Elle retourne des valeurs justes				3pts
 	-- Elle retourne -1 si le groupe n'existe pas	2pts
-	Print 'Fonction NbResp existe					1pt'
+	Print 'Fonction NbResp existe                   1pt'
 	set @Nbpts = @Nbpts+1
+
+	-- Groupe inconnu
+	declare @n int;
+	execute @n = NbResp 'tagada'
+	if @n = -1
+	Begin
+		Print 'Groupe inconnu OK                        2pts'
+		set @Nbpts = @Nbpts+1
+	End
+	Else
+		Print 'Groupe inconnu pas OK'
+
+	-- Calcul
+	execute @n = NbResp 'Ecoliers'
+	if @n = 3
+	Begin
+		INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),1,2,CURRENT_TIMESTAMP); -- Ecoliers/Entraîneur
+		execute @n = NbResp 'Ecoliers'
+		if @n = 4
+		Begin
+			Print 'Calcul OK                                3pts'
+			set @Nbpts = @Nbpts+3
+		End
+		Else
+			Print 'Valeur hardcodée ???'
+	End
+	Else
+		Print 'Calcul pas OK'
 End
-else
+Else
 	Print 'Fonction NbResp n''existe pas'
 
 -- Exo 2
@@ -1110,8 +1224,65 @@ if @OID is not null
 Begin
 	-- Ajout de 2 coaches interclub OK				3pts
 	-- Elle retourne -1 si le groupe n'existe pas	2pts
-	Print 'Trigger CheckMaxResp existe				1pt'
+	Print 'Trigger CheckMaxResp existe              1pt'
 	set @Nbpts = @Nbpts+1
+
+	-- Insertion simple
+	Begin try -- les 5 premiers doivent passer
+		INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP); -- Seniors/Coach
+		INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP); -- Seniors/Coach
+		INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP); -- Seniors/Coach
+		INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP); -- Seniors/Coach
+		INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP); -- Seniors/Coach
+		Begin try -- mais pas le 6e
+			INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP); -- Seniors/Coach
+			Print 'Erreur dans le trigger'
+		End try
+		Begin catch
+			update clubGroup set maxResp = 7 where idclubGroup = 5 -- augmentaer la limite
+			Begin try -- les 6e et 7e doivent passer
+				INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP); -- Seniors/Coach
+				INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP); -- Seniors/Coach
+				Begin try -- mais pas le 8e
+					INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP); -- Seniors/Coach
+					Print 'Erreur dans le trigger'
+				End try
+				Begin catch
+					Print 'Trigger OK sur insertion simple          3pts'
+					set @Nbpts = @Nbpts+3
+					delete from belongs where fkGroup = 5
+					-- Insertion multiple: les 4 premiers doivent passer
+					Begin try
+						INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP), -- Seniors/Coach
+																					  ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP), -- Seniors/Coach
+																					  ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP), -- Seniors/Coach
+																					  ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP); -- Seniors/Coach
+						Begin try -- Les 4 suivants ne doivent pas passer
+							INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP), -- Seniors/Coach
+																						  ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP), -- Seniors/Coach
+																						  ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP), -- Seniors/Coach
+																						  ((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),5,3,CURRENT_TIMESTAMP); -- Seniors/Coach
+							Print 'Trigger pas OK sur insertion multiple'
+						End try
+						Begin catch
+							Print 'Trigger OK sur insertion multiple        3pts'
+							set @Nbpts = @Nbpts+3
+						End catch
+					End try
+					Begin catch
+						Print 'Trigger pas OK sur insertion multiple'
+					End catch
+				End catch
+			End try
+			Begin catch
+				Print 'Erreur dans le trigger, limite hardcodée ??'
+			End catch
+			
+		End catch
+	End try
+	Begin catch
+		Print 'Erreur dans le trigger'
+	End catch
 End
 else
 	Print 'Trigger CheckMaxResp n''existe pas'
@@ -1122,26 +1293,33 @@ if @OID is not null
 Begin
 	-- Ajout de 2 coaches interclub OK				3pts
 	-- Elle retourne -1 si le groupe n'existe pas	2pts
-	Print 'Trigger CreateRole existe				1pt'
+	Print 'Trigger CreateRole existe                1pt'
 	set @Nbpts = @Nbpts+1
+
+	declare @nbrolesbefore int = (select count(*) from sys.database_principals where type_desc = 'DATABASE_ROLE')
+	insert into clubGroup (groupName) values ('Ladies')
+	declare @nbrolesafter int = (select count(*) from sys.database_principals where type_desc = 'DATABASE_ROLE')
+	declare @nbgoodrolesafter int = (select count(*) from sys.database_principals where type_desc = 'DATABASE_ROLE' and name = 'LadiesAdmin')
+
+	if @nbrolesafter = @nbrolesbefore + 1
+	Begin
+		Print 'Rôle créé                                2pts'
+		set @Nbpts = @Nbpts+2
+		if @nbgoodrolesafter = 1
+		Begin
+			Print 'Rôle bien nommé                          2pts'
+			set @Nbpts = @Nbpts+2
+		End
+		Else
+			Print 'Rôle mal nommé'
+	End
+	Else
+		Print 'Pas de rôle créé'	
 End
 else
 	Print 'Trigger CreateRole n''existe pas'
 
--- Exo 2
-Set @OID = (select object_id from sys.triggers where name = 'NewResp')
-if @OID is not null
-Begin
-	-- Ajout de 2 coaches interclub OK				3pts
-	-- Elle retourne -1 si le groupe n'existe pas	2pts
-	Print 'Trigger NewResp existe					1pt'
-	set @Nbpts = @Nbpts+1
-End
-else
-	Print 'Trigger NewResp n''existe pas'
-
-
-declare @note float = CAST(@Nbpts as float) / 40.0 * 5.0 + 1.0
+declare @note float = CAST(@Nbpts as float) / @NbMaxPts * 5.0 + 1.0
 set @note = round((@note * 2.0),0) / 2.0
 Print '-------------------------------------------------------'
 Print CAST (@NbPts as varchar(3)) + ' points obtenus sur ' + CAST (@NbMaxPts as varchar(3)) + ', Note= ' + CAST (@note as varchar(3));
