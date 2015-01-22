@@ -84,7 +84,8 @@ CREATE TABLE court(
 
 CREATE TABLE clubGroup(
 	idclubGroup int IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	groupName varchar(45) NOT NULL);
+	groupName varchar(45) NOT NULL,
+	maxResp int NOT NULL DEFAULT 1);
 
 CREATE TABLE role(
 	idrole int IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -313,13 +314,25 @@ GO
 INSERT INTO court (courtName) VALUES ('Central'), ('Numéro 1'), ('Numéro 2');
 GO
 
-INSERT INTO clubGroup (groupName) VALUES ('Ecoliers'), ('Juniors'), ('Interclubs'), ('Comité');
+INSERT INTO clubGroup (groupName, maxResp) VALUES ('Ecoliers',1), ('Juniors',1), ('Interclubs',3), ('Comité',2);
 GO
 
 INSERT INTO [role] (roleDescription, isLeading) VALUES ('Président',0), ('Entraîneur',1), ('Coach',1), ('Caissier',0), ('Membre',0);
 GO
 
-INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES ((SELECT TOP 1 UserId FROM Users where LastName Like 'A%'),4,5,CURRENT_TIMESTAMP), ((SELECT TOP 1 UserId FROM Users where LastName Like 'E%'),4,5,CURRENT_TIMESTAMP), ((SELECT TOP 1 UserId FROM Users where LastName Like 'D%'),4,5,CURRENT_TIMESTAMP),((SELECT TOP 1 UserId FROM Users where LastName Like 'C%'),4,1,CURRENT_TIMESTAMP), ((SELECT TOP 1 UserId FROM Users where LastName Like 'B%'),4,4,CURRENT_TIMESTAMP);
+INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES 
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),4,5,CURRENT_TIMESTAMP), -- Comité/Membre
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),4,5,CURRENT_TIMESTAMP), -- Comité/Membre 
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),4,5,CURRENT_TIMESTAMP), -- Comité/Membre
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),4,1,CURRENT_TIMESTAMP), -- Comité/Président
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),4,4,CURRENT_TIMESTAMP), -- Comité/Caissier
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,1,CURRENT_TIMESTAMP), -- Interclubs/Membre
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,1,CURRENT_TIMESTAMP), -- Interclubs/Membre
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,1,CURRENT_TIMESTAMP), -- Interclubs/Membre
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,1,CURRENT_TIMESTAMP), -- Interclubs/Membre
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,1,CURRENT_TIMESTAMP), -- Interclubs/Membre
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,1,CURRENT_TIMESTAMP), -- Interclubs/Membre
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,2,CURRENT_TIMESTAMP); -- Interclubs/Entraîneur
 GO
 
 INSERT INTO NPA (NPAVal,City) VALUES (1000, 'Lausanne CT'),(1001, 'Lausanne'),(1002, 'Lausanne'),(1003, 'Lausanne'),(1004, 'Lausanne'),(1005, 'Lausanne'),(1006, 'Lausanne'),(1007, 'Lausanne'),(1008, 'Prilly'),(1009, 'Pully'),(1010, 'Lausanne'),(1011, 'Lausanne'),(1012, 'Lausanne'),(1014, 'Lausanne Adm cant'),(1015, 'Lausanne'),(1017, 'Lausanne Veillon'),(1018, 'Lausanne'),(1019, 'Lausanne'),(1020, 'Renens VD'),(1022, 'Chavannes-Renens'),(1023, 'Crissier'),(1024, 'Ecublens VD'),(1025, 'St-Sulpice VD'),(1026, 'Echandens-Denges'),(1027, 'Lonay'),(1028, 'Préverenges'),(1029, 'Villars-Ste-Croix'),(1030, 'Bussigny-Lausanne'),(1031, 'Mex VD'),(1032, 'Romanel-s-Lausanne'),(1033, 'Cheseaux-Lausanne'),(1034, 'Boussens'),(1035, 'Bournens'),(1036, 'Sullens'),(1037, 'Etagniéres'),(1038, 'Bercher'),(1039, 'Cheseaux Polyval'),(1040, 'Echallens'),(1041, 'Dommartin'),(1042, 'Bettens'),(1043, 'Sugnens'),(1044, 'Fey'),(1045, 'Ogens'),(1046, 'Rueyres'),(1047, 'Oppens'),(1052, 'Mont-sur-Lausanne'),(1053, 'Bretigny-Morrens'),(1054, 'Morrens VD'),(1055, 'Froideville'),(1058, 'Villars-Tiercelin'),(1059, 'Peney-le-Jorat'),(1061, 'Villars-Mendraz'),(1062, 'Sottens'),(1063, 'Peyres-Possens'),(1066, 'Epalinges'),(1068, 'Les Monts-de-Pully'),(1070, 'Puidoux'),(1071, 'Chexbres'),(1072, 'Forel (Lavaux)'),(1073, 'Savigny'),(1076, 'Ferlens VD'),(1077, 'Servion'),(1078, 'Essertes'),(1080, 'Les Cullayes'),(1081, 'Montpreveyres'),(1082, 'Corcelles-le-Jorat'),(1083, 'Méziéres VD'),(1084, 'Carrouge VD'),(1085, 'Vulliens'),(1088, 'Ropraz'),(1090, 'La Croix (Lutry)'),(1091, 'Grandvaux'),(1092, 'Belmont-Lausanne'),(1093, 'La Conversion'),(1094, 'Paudex'),(1095, 'Lutry'),(1096, 'Cully'),(1097, 'Riex'),(1098, 'Epesses'),(1110, 'Morges'),(1112, 'Echichens'),(1113, 'St-Saphorin-Morges'),(1114, 'Colombier VD'),(1115, 'Vullierens'),(1116, 'Cottens VD'),(1117, 'Grancy'),(1121, 'Bremblens'),(1122, 'Romanel-sur-Morges'),(1123, 'Aclens'),(1124, 'Gollion'),(1125, 'Monnaz'),(1126, 'Vaux-sur-Morges'),(1127, 'Clarmont'),(1128, 'Reverolle'),(1131, 'Tolochenaz'),(1132, 'Lully VD'),(1134, 'Vufflens-Ch‚teau'),(1135, 'Denens'),(1136, 'Bussy-Chardonney'),(1141, 'Sévery'),(1142, 'Pampigny'),(1143, 'Apples'),(1144, 'Ballens'),(1145, 'Biére'),(1146, 'Mollens VD'),(1147, 'Montricher'),(1148, 'LIsle'),(1149, 'Berolle'),(1162, 'St-Prex'),(1163, 'Etoy'),(1164, 'Buchillon'),(1165, 'Allaman'),(1166, 'Perroy'),(1167, 'Lussy-sur-Morges'),(1168, 'Villars-sous-Yens'),(1169, 'Yens'),(1170, 'Aubonne'),(1172, 'Bougy-Villars'),(1173, 'Féchy'),(1174, 'Montherod'),(1175, 'Lavigny'),(1176, 'St-Livres'),(1180, 'Rolle'),(1182, 'Gilly'),(1183, 'Bursins'),(1184, 'Vinzel'),(1185, 'Mont-sur-Rolle'),(1186, 'Essertines-Rolle'),(1187, 'St-Oyens'),(1188, 'Gimel'),(1189, 'Saubraz'),(1195, 'Dully-Bursinel'),(1196, 'Gland'),(1197, 'Prangins'),(1200, 'Genève'),(1201, 'Genève'),(1202, 'Genève'),(1203, 'Genève'),(1204, 'Genève'),(1205, 'Genève'),(1206, 'Genève'),(1207, 'Genève'),(1208, 'Genève'),(1209, 'Genève'),(1211, 'Genève 1'),(1212, 'Grand-Lancy'),(1213, 'Petit-Lancy'),(1214, 'Vernier'),(1215, 'Genève'),(1216, 'Cointrin'),(1217, 'Meyrin'),(1218, 'Le Grand-Saconnex'),(1219, 'Le Lignon'),(1220, 'Les Avanchets'),(1222, 'Vésenaz'),(1223, 'Cologny'),(1224, 'Chêne-Bougeries'),(1225, 'Chêne-Bourg'),(1226, 'Thonex'),(1227, 'Carouge GE'),(1228, 'Plan-les-Ouates'),(1231, 'Conches'),(1232, 'Confignon'),(1233, 'Bernex'),(1234, 'Vessy'),(1236, 'Cartigny'),(1237, 'Avully'),(1239, 'Collex'),(1240, 'Genève'),(1241, 'Puplinge'),(1242, 'Satigny'),(1243, 'Presinge'),(1244, 'Choulex'),(1245, 'Collonge-Bellerive'),(1246, 'Corsier GE'),(1247, 'Aniéres'),(1248, 'Hermance'),(1251, 'Gy'),(1252, 'Meinier'),(1253, 'Vandoeuvres'),(1254, 'Jussy'),(1255, 'Veyrier'),(1256, 'Troinex'),(1257, 'La Croix-de-Rozon'),(1258, 'Perly'),(1260, 'Nyon'),(1261, 'Marchissy'),(1262, 'Eysins'),(1263, 'Crassier'),(1264, 'St-Cergue'),(1265, 'La Cure'),(1266, 'Duillier'),(1267, 'Vich-Coinsins'),(1268, 'Burtigny'),(1269, 'Bassins'),(1270, 'Trélex'),(1271, 'Givrins'),(1272, 'Genolier'),(1273, 'Le Muids'),(1274, 'Grens'),(1275, 'Chéserex'),(1276, 'Gingins'),(1277, 'Borex'),(1278, 'La Rippe'),(1279, 'Chavannes-de-Bogis'),(1281, 'Russin'),(1283, 'Dardagny'),(1284, 'Chancy'),(1285, 'Athenaz (Avusy)'),(1286, 'Soral'),(1287, 'Laconnex'),(1288, 'Aire-la-Ville'),(1289, 'Genève Serv. Spéc.'),(1290, 'Versoix'),(1291, 'Commugny'),(1292, 'Chambésy'),(1293, 'Bellevue'),(1294, 'Genthod'),(1295, 'Mies-Tannay'),(1296, 'Coppet'),(1297, 'Founex'),(1298, 'Céligny'),(1299, 'Crans-prés-Céligny'),(1300, 'Eclépens CC'),(1302, 'Vufflens-la-Ville'),(1303, 'Penthaz'),(1304, 'Senarclens'),(1305, 'Penthalaz'),(1306, 'Daillens'),(1307, 'Lussery-Villars'),(1308, 'La Chaux-Cossonay'),(1310, 'Daillens Dist Ba'),(1311, 'Eclépens SC'),(1312, 'Eclépens'),(1313, 'Ferreyres'),(1315, 'La Sarraz'),(1316, 'Chevilly'),(1317, 'Orny'),(1318, 'Pompaples'),(1320, 'Daillens ST PP 1'),(1321, 'Arnex-sur-Orbe'),(1322, 'Croy'),(1323, 'RomainmÙtier'),(1324, 'Premier'),(1325, 'Vaulion'),(1326, 'Juriens'),(1329, 'Bretonniéres'),(1330, 'Daillens CALL'),(1337, 'Vallorbe'),(1338, 'Ballaigues'),(1341, 'Orient'),(1342, 'Le Pont'),(1343, 'Les Charbonniéres'),(1344, 'LAbbaye'),(1345, 'Le Lieu'),(1346, 'Les Bioux'),(1347, 'Le Sentier'),(1348, 'Le Brassus'),(1350, 'Orbe'),(1352, 'Agiez'),(1353, 'Bofflens'),(1354, 'Montcherand'),(1355, 'LAbergement'),(1356, 'Les Clées'),(1357, 'Lignerolle'),(1358, 'Valeyres-Rances'),(1372, 'Bavois'),(1373, 'Chavornay'),(1374, 'Corcelles-Chavorn'),(1375, 'Penthéréaz'),(1376, 'Goumoens-la-Ville'),(1377, 'Oulens-Echallens'),(1400, 'Yverdon-les-Bains'),(1401, 'Yverdon-les-Bains'),(1404, 'Cuarny'),(1405, 'Pomy'),(1406, 'Cronay'),(1407, 'Bioley-Magnoux'),(1408, 'Prahins'),(1409, 'Chanéaz'),(1410, 'Thierrens'),(1412, 'Valeyres-Ursins'),(1413, 'Orzens'),(1415, 'Molondin'),(1416, 'Pailly'),(1417, 'Epautheyres'),(1418, 'Vuarrens'),(1420, 'Fiez'),(1421, 'Fontaines-Grandson'),(1422, 'Grandson'),(1423, 'Villars-Burquin'),(1424, 'Champagne'),(1425, 'Onnens VD'),(1426, 'Concise'),(1427, 'Bonvillars'),(1428, 'Mutrux'),(1429, 'Giez'),(1430, 'Orges'),(1431, 'Vugelles-La Mothe'),(1432, 'Belmont-Yverdon'),(1433, 'Suchy'),(1434, 'Ependes VD'),(1435, 'Essert-Pittet'),(1436, 'Treycovagnes'),(1437, 'Suscévaz'),(1438, 'Mathod'),(1439, 'Rances'),(1440, 'Montagny-Chamard'),(1441, 'Valeyres-Montagny'),(1442, 'Montagny-Yverdon'),(1443, 'Champvent'),(1445, 'Vuiteboeuf');
@@ -970,3 +983,166 @@ Begin
 	Close Fields
 	Deallocate Fields
 End
+
+GO
+-- Epreuve
+
+-- NbResp:			Returns the number of responsibles of a group
+-- Author:			X. Carrel
+-- Date:			Jan 2015
+
+CREATE FUNCTION NbResp (@groupName varchar(45))
+RETURNS int
+AS
+Begin
+	Declare @gid int;
+	Set @gid = (Select idclubGroup from clubGroup where groupName = @groupName);
+
+	if @gid is null return -1;
+
+	Declare @nb int;
+	Set @nb  = (Select count(UserName)
+	            FROM ((belongs inner join users on fkMember=UserId)
+				       inner join clubGroup on fkGroup=idclubGroup)
+					   inner join role on fkRole=idrole
+				GROUP BY idclubGroup,isLeading
+				HAVING idclubGroup = @gid AND isLeading = 1);
+
+	return @nb
+End
+
+GO
+
+CREATE Trigger CheckMaxResp
+ON belongs
+AFTER INSERT
+AS
+Begin
+	declare @groupid int;
+	declare @groupName varchar(45);
+	declare @maxresp int;
+	declare @nbresp int;
+	
+	Declare cursins Cursor For
+	select fkGroup from inserted;
+
+	Open cursins;
+	Fetch Next From cursins Into @groupid;
+
+	while @@FETCH_STATUS = 0
+	Begin
+		set @groupName = (select groupName from clubGroup where idclubGroup = @groupid);
+		set @maxresp = (select maxResp from clubGroup where idclubGroup = @groupid);
+		execute @nbresp = NbResp @groupName;
+		if @nbresp > @maxresp
+		Begin
+			RAISERROR ('Trop de responsables',1,1);
+			Rollback;
+		End
+		-- Move on to next record
+		Fetch Next From cursins Into @groupid;
+	End
+			
+	Close cursins;
+	Deallocate cursins;
+
+End
+
+GO
+
+CREATE Trigger CreateRole
+ON clubGroup
+AFTER INSERT
+AS
+Begin
+	declare @groupName varchar(45);
+	set @groupName = (select groupName from inserted);
+
+	declare @sql nvarchar(50) = 'CREATE ROLE '+@groupname
+	EXEC sp_executesql @sql
+	
+End
+
+GO
+
+CREATE Trigger NewResp
+ON belongs
+AFTER INSERT
+AS
+Begin
+	declare @groupName varchar(45) = (select groupName from (inserted inner join clubgroup on fkGroup=idclubGroup) inner join role on fkRole = idrole where isLeading = 1);
+	if @groupName is null return;
+
+	declare @username varchar(45) = (select userName from inserted inner join Users on fkMember = UserId);
+
+	declare @sql nvarchar(50);
+	set @sql = 'CREATE LOGIN '+@username + ' WITH Password=pa$$w0rd MUST_CHANGE, '
+	EXEC sp_executesql @sql
+	
+End
+
+GO
+
+
+-- End of the script: here starts the evaluation...
+Print '-------------------------------------------------------'
+Print '------------------   Evaluation   ---------------------'
+Print '-------------------------------------------------------'
+Declare @Nbpts int = 0
+Declare @NbMaxpts int = 40
+Declare @OID int
+SET NOCOUNT ON
+-- Exo 1
+Set @OID = (select object_id from sys.objects where type = 'FN' and name='NbResp')
+if @OID is not null
+Begin
+	-- Elle retourne des valeurs justes				3pts
+	-- Elle retourne -1 si le groupe n'existe pas	2pts
+	Print 'Fonction NbResp existe					1pt'
+	set @Nbpts = @Nbpts+1
+End
+else
+	Print 'Fonction NbResp n''existe pas'
+
+-- Exo 2
+Set @OID = (select object_id from sys.triggers where name = 'CheckMaxResp')
+if @OID is not null
+Begin
+	-- Ajout de 2 coaches interclub OK				3pts
+	-- Elle retourne -1 si le groupe n'existe pas	2pts
+	Print 'Trigger CheckMaxResp existe				1pt'
+	set @Nbpts = @Nbpts+1
+End
+else
+	Print 'Trigger CheckMaxResp n''existe pas'
+
+-- Exo 3
+Set @OID = (select object_id from sys.triggers where name = 'CreateRole')
+if @OID is not null
+Begin
+	-- Ajout de 2 coaches interclub OK				3pts
+	-- Elle retourne -1 si le groupe n'existe pas	2pts
+	Print 'Trigger CreateRole existe				1pt'
+	set @Nbpts = @Nbpts+1
+End
+else
+	Print 'Trigger CreateRole n''existe pas'
+
+-- Exo 2
+Set @OID = (select object_id from sys.triggers where name = 'NewResp')
+if @OID is not null
+Begin
+	-- Ajout de 2 coaches interclub OK				3pts
+	-- Elle retourne -1 si le groupe n'existe pas	2pts
+	Print 'Trigger NewResp existe					1pt'
+	set @Nbpts = @Nbpts+1
+End
+else
+	Print 'Trigger NewResp n''existe pas'
+
+
+declare @note float = CAST(@Nbpts as float) / 40.0 * 5.0 + 1.0
+set @note = round((@note * 2.0),0) / 2.0
+Print '-------------------------------------------------------'
+Print CAST (@NbPts as varchar(3)) + ' points obtenus sur ' + CAST (@NbMaxPts as varchar(3)) + ', Note= ' + CAST (@note as varchar(3));
+Print '-------------------------------------------------------'
