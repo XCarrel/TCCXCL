@@ -34,7 +34,7 @@ namespace TCC
             pctIdenticon.Border = 1;
         }
 
-        public void setUsernameName (string Uname)
+        public void setName (string Uname)
         {
             lblUName.Text = Uname;
             string uid = Global.getUserId(Uname);
