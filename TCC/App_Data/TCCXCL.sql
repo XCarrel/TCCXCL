@@ -994,92 +994,96 @@ End
 -------------------------------------------------------------------------------------------------------
 GO
 
-Use Master
-GO
-
--- Eliminate all WINDOWS and SQL logins
-
-Declare @lname varchar(50)
-Declare @sql nvarchar(50)
-Declare Logins cursor for
-	SELECT name FROM sys.server_principals
-	WHERE (type_desc = 'SQL_LOGIN' AND name not like '##%' AND name <> 'sa') -- SQL logins, save system ones
-	   OR (type_desc = 'WINDOWS_LOGIN' AND name not like 'NT %')-- Windows logins, save system ones
-
-Open Logins
-Fetch Next From Logins Into @lname
-While @@FETCH_STATUS = 0
+if SUSER_NAME() <> 'sa'
+	print 'Login is not sa -> skip security stuff'
+else
 Begin
-	set @sql = 'DROP LOGIN [' + @lname + ']' -- Brackets in case there are special chars in the name
-	EXEC sp_executesql @sql
+	print 'Login is sa -> perform security stuff'
+	Use Master
+
+	-- Eliminate all WINDOWS and SQL logins
+
+	Declare @lname varchar(50)
+	Declare @sql nvarchar(1000)
+	Declare Logins cursor for
+		SELECT name FROM sys.server_principals
+		WHERE (type_desc = 'SQL_LOGIN' AND name not like '##%' AND name <> 'sa') -- SQL logins, save system ones
+		   -- OR (type_desc = 'WINDOWS_LOGIN' AND name not like 'NT %')-- Windows logins, save system ones
+
+	Open Logins
 	Fetch Next From Logins Into @lname
+	While @@FETCH_STATUS = 0
+	Begin
+		set @sql = 'DROP LOGIN [' + @lname + ']' -- Brackets in case there are special chars in the name
+		EXEC sp_executesql @sql
+		Fetch Next From Logins Into @lname
+	End
+	Close Logins
+	Deallocate Logins
+
+	-- Create a guest login
+	-- Guests can only select from court and bookings
+
+	Use TCCXCL
+
+	CREATE LOGIN guest WITH PASSWORD = 'guest', DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF;
+	CREATE USER TCCguest FOR LOGIN guest;
+	GRANT SELECT ON court TO TCCguest;
+	GRANT SELECT ON booking TO TCCguest;
+
+	-- Create a view so that guests can see the names associated to bookings
+	set @sql = '
+	Create View BookingsForGuests AS
+		Select Lastname as Member, moment, courtName from booking INNER JOIN Users ON fkMadeBy = UserId INNER JOIN court ON fkCourt = idcourt
+			union
+		Select Lastname as Member, moment, courtName from booking INNER JOIN Users ON fkPartner = UserId INNER JOIN court ON fkCourt = idcourt'
+
+	exec sp_executesql @sql -- Use execute because direct execution requires TSQL batches (GO)
+
+	GRANT SELECT ON BookingsForGuests to TCCguest
+
+	-- Create individual logins for multiple TCCAdmins
+	CREATE LOGIN Joe WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
+	CREATE LOGIN Jack WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
+	CREATE LOGIN William WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
+	CREATE LOGIN Averell WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
+
+	-- Create users
+	CREATE USER Joe FOR LOGIN Joe;
+	CREATE USER Jack FOR LOGIN Jack;
+	CREATE USER William FOR LOGIN William;
+	CREATE USER Averell FOR LOGIN Averell;
+
+	-- Create a role
+	CREATE ROLE TCCAdmin
+
+	-- Add users in the role
+	EXEC sp_addrolemember 'TCCAdmin', 'Joe';
+	EXEC sp_addrolemember 'TCCAdmin', 'Jack';
+	EXEC sp_addrolemember 'TCCAdmin', 'William';
+	EXEC sp_addrolemember 'TCCAdmin', 'Averell';
+
+	-- Grant permissions to role
+	EXEC sp_addrolemember 'db_datareader', 'TCCAdmin';
+	EXEC sp_addrolemember 'db_datawriter', 'TCCAdmin';
+
+	-- Customize certain users
+	DENY UPDATE, DELETE, INSERT ON court TO Averell
+	DENY UPDATE, DELETE, INSERT ON Users TO Averell
+	GRANT UPDATE ON Users (FirstName, LastName) TO Averell
+
+	GRANT CREATE VIEW TO William
+	GRANT ALTER ON SCHEMA::dbo TO William
+
+	EXEC sp_addrolemember 'db_owner', 'Joe';
+
+	-- Create Login/User for the application
+	CREATE LOGIN TCCApp WITH PASSWORD = '1q2w3e4r', DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF ;
+	CREATE USER TCCApp FOR LOGIN TCCApp;
+	EXEC sp_addrolemember 'db_datareader', 'TCCApp';
+	EXEC sp_addrolemember 'db_datawriter', 'TCCApp';
+
 End
-Close Logins
-Deallocate Logins
-GO
-
--- Create a guest login
--- Guests can only select from court and bookings
-
-Use TCCXCL
-GO
-
-CREATE LOGIN guest WITH PASSWORD = 'guest', DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF;
-CREATE USER TCCguest FOR LOGIN guest;
-GRANT SELECT ON court TO TCCguest;
-GRANT SELECT ON booking TO TCCguest;
-GO
-
--- Create a view so that guests can see the names associated to bookings
-Create View BookingsForGuests AS
-	Select Lastname as Member, moment, courtName from booking INNER JOIN Users ON fkMadeBy = UserId INNER JOIN court ON fkCourt = idcourt
-		union
-	Select Lastname as Member, moment, courtName from booking INNER JOIN Users ON fkPartner = UserId INNER JOIN court ON fkCourt = idcourt
-
-GO
-GRANT SELECT ON BookingsForGuests to TCCguest
-
--- Create individual logins for multiple TCCAdmins
-CREATE LOGIN Joe WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
-CREATE LOGIN Jack WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
-CREATE LOGIN William WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
-CREATE LOGIN Averell WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
-
--- Create users
-CREATE USER Joe FOR LOGIN Joe;
-CREATE USER Jack FOR LOGIN Jack;
-CREATE USER William FOR LOGIN William;
-CREATE USER Averell FOR LOGIN Averell;
-
--- Create a role
-CREATE ROLE TCCAdmin
-
--- Add users in the role
-EXEC sp_addrolemember 'TCCAdmin', 'Joe';
-EXEC sp_addrolemember 'TCCAdmin', 'Jack';
-EXEC sp_addrolemember 'TCCAdmin', 'William';
-EXEC sp_addrolemember 'TCCAdmin', 'Averell';
-
--- Grant permissions to role
-EXEC sp_addrolemember 'db_datareader', 'TCCAdmin';
-EXEC sp_addrolemember 'db_datawriter', 'TCCAdmin';
-
--- Customize certain users
-DENY UPDATE, DELETE, INSERT ON court TO Averell
-DENY UPDATE, DELETE, INSERT ON Users TO Averell
-GRANT UPDATE ON Users (FirstName, LastName) TO Averell
-
-GRANT CREATE VIEW TO William
-GRANT ALTER ON SCHEMA::dbo TO William
-
-EXEC sp_addrolemember 'db_owner', 'Joe';
-
--- Create Login/User for the application
-CREATE LOGIN TCCApp WITH PASSWORD = '1q2w3e4r', DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF ;
-CREATE USER TCCApp FOR LOGIN TCCApp;
-EXEC sp_addrolemember 'db_datareader', 'TCCApp';
-EXEC sp_addrolemember 'db_datawriter', 'TCCApp';
-
 
 GO
 -- Epreuve
@@ -1087,6 +1091,8 @@ GO
 -- NbResp:			Returns the number of responsibles of a group
 -- Author:			X. Carrel
 -- Date:			Jan 2015
+Use TCCXCL
+GO
 
 CREATE FUNCTION NbResp (@groupName varchar(45))
 RETURNS int
