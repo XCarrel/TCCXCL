@@ -58,13 +58,13 @@ namespace TCC {
         protected global::System.Web.UI.WebControls.HyperLink lnkBookings;
         
         /// <summary>
-        /// lnkFriends control.
+        /// lnkStats control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HyperLink lnkFriends;
+        protected global::System.Web.UI.WebControls.HyperLink lnkStats;
         
         /// <summary>
         /// FeaturedContent control.

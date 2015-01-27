@@ -76,8 +76,11 @@ namespace TCC
             if (Global.getUsername() != "") // User logged in
             {
                 lnkProfile.Visible = true;
-                lnkFriends.Visible = true;
-                if (Global.currentUserIsAdmin()) lnkMembers.Visible = true;
+                if (Global.currentUserIsAdmin())
+                {
+                    lnkMembers.Visible = true;
+                    lnkStats.Visible = true;
+                }
                 if (Global.currentUserIsTeamLeader(out gleader)) lnkBookings.Visible = true;
             }
         }

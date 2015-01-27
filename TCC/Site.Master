@@ -71,7 +71,7 @@
                         <li><asp:HyperLink ID="lnkMembers" visible="false" runat="server" href="/Pages/Members">Membres</asp:HyperLink></li>
                         <li><asp:HyperLink ID="lnkProfile" visible="false" runat="server" href="/Pages/Profile">Profil</asp:HyperLink></li>
                         <li><asp:HyperLink ID="lnkBookings" visible="false" runat="server" href="/Pages/Bookings">Réservations d'équipe</asp:HyperLink></li>
-                        <li><asp:HyperLink ID="lnkFriends" visible="false" runat="server" href="/Pages/Friends">Amis</asp:HyperLink></li>
+                        <li><asp:HyperLink ID="lnkStats" visible="false" runat="server" href="/Pages/Stats">Stats</asp:HyperLink></li>
                     </ul>
                 </nav>
             </div>
