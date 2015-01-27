@@ -18,7 +18,7 @@ namespace TCC.Pages
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!Global.currentUserIsAdmin()) Server.Transfer("Niet.aspx");
+            if (!Global.currentUserIsAdmin()) Response.Redirect("Niet.aspx");
         }
 
         protected void cmdInvitations_Click(object sender, EventArgs e)
@@ -102,7 +102,7 @@ namespace TCC.Pages
 
             // Get visitors
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "select count(*) from booking where guest is not null and fkMadeBy is null and fkPartner is null and moment > dateadd(month, -6, getdate())";
+            cmd.CommandText = "select count(*) from booking where guest is not null and fkMadeBy is null and fkPartner is null and moment > dateadd(month, -6, getdate()) and moment < getdate()";
             SqlConnection cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
             cmd.Connection = cnx;
             cnx.Open();
@@ -114,7 +114,7 @@ namespace TCC.Pages
             rdr.Close();
 
             // Get unpaid visits
-            cmd.CommandText = "select count(*) from booking where guest is not null and fkMadeBy is null and fkPartner is null and moment > dateadd(month, -6, getdate()) and paid = 0";
+            cmd.CommandText = "select count(*) from booking where guest is not null and fkMadeBy is null and fkPartner is null and moment > dateadd(month, -6, getdate()) and moment < getdate() and paid = 0";
             cnx = new SqlConnection(ConfigurationManager.ConnectionStrings["TCCXCLConnection"].ConnectionString);
             cmd.Connection = cnx;
             cnx.Open();
