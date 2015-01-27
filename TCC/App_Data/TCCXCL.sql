@@ -357,7 +357,8 @@ Declare @zeday datetime = GETDATE(),
 		@madeByint integer = 0,
 		@partnerint integer = 0,
 		@madeBy uniqueidentifier,
-		@partner uniqueidentifier;
+		@partner uniqueidentifier,
+		@paid int = 0;
 
 Set @zeday = CAST('2014-04-01' AS DATETIME);
 
@@ -375,12 +376,16 @@ Begin
 		Set @moment = DATEADD(HOUR,@hour,@zeday);
 		Begin Try
 			if @nres % 7 = 0 -- Guest only
-				Insert Into booking (moment,guest,fkCourt) Values (@moment,'Invité',@court);
+			Begin
+				set @paid = 0;
+				if (@nres % 9) > 0 set @paid = 1
+				Insert Into booking (moment,guest,fkCourt, paid) Values (@moment,(select Firstname from Users where UserNb = ((@nres + @nbres) * 13) % 200 + 1),@court, @paid);
+			End
 			else
 			Begin
 				Set @madeBy = (Select UserId From Users Where UserNb = (@nres * 11) % 200 + 1);
 				if (@nres % 3 = 0) -- Member + Guest
-					Insert Into booking (moment,fkMadeBy,guest,fkCourt) Values (@moment,@madeBy,'Invité',@court);
+					Insert Into booking (moment,fkMadeBy,guest,fkCourt) Values (@moment,@madeBy,(select Firstname from Users where UserNb = ((@nres + @nbres) * 13) % 200 + 1),@court);
 				else -- Member + Member
 				Begin
 					Set @partner = (Select UserId From Users Where UserNb = (@nres * 17) % 200 + 1);
