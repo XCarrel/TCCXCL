@@ -230,7 +230,6 @@
     <Content Include="Pages\Members.aspx" />
     <Content Include="Pages\Profile.aspx" />
     <Content Include="Pages\Admin.aspx" />
-    <Content Include="Pages\Stats.aspx" />
     <None Include="Scripts\jquery-1.8.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.8.2.js" />
     <Content Include="Scripts\jquery-1.8.2.min.js" />
@@ -408,13 +407,6 @@
     </Compile>
     <Compile Include="Pages\Admin.aspx.designer.cs">
       <DependentUpon>Admin.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\Stats.aspx.cs">
-      <DependentUpon>Stats.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Pages\Stats.aspx.designer.cs">
-      <DependentUpon>Stats.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
