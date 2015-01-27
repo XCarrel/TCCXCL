@@ -383,8 +383,8 @@ Begin
 			End
 			else
 			Begin
-				Set @madeBy = (Select UserId From Users Where UserNb = (@nres * 11) % 200 + 1);
-				if (@nres % 3 = 0) -- Member + Guest
+				Set @madeBy = (Select UserId From Users Where UserNb = (@nres * 11) % 200 + 1 and LastName not in ('Murray','Berdych','MonFils','Seppi'));
+				if (@nres % 3 = 0) and @madeby is not null -- Member + Guest
 					Insert Into booking (moment,fkMadeBy,guest,fkCourt) Values (@moment,@madeBy,(select Firstname from Users where UserNb = ((@nres + @nbres) * 13) % 200 + 1),@court);
 				else -- Member + Member
 				Begin
