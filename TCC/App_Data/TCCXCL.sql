@@ -1,13 +1,15 @@
 -- TCCXCL.sql:	This script creates a database for the TCC (Tennis Club Chavornay) app
 --				The database is initialized with 200 fake members and fake bookings spread out
 --				over 9 weeks.
--- Version:		1.1, jan 2015
+-- Version:		1.2, jan 2015
 -- Author:		X. Carrel
 --
 -- History:
 --			1.1:	- Added function FrequentPlayers
 --					- Added stored procedures InsertDummyRecord and InsertDummyRecords
---
+--			1.2: prepared for sql2 module exam:
+--					- Added field maxResp to clubGroup
+--					- Added auto-evaluation script
 --
 
 USE master
@@ -60,8 +62,7 @@ CREATE TABLE booking(
 	fkMadeBy uniqueidentifier NULL,
 	fkPartner uniqueidentifier NULL,
 	guest varchar(45) NULL,
-	fkCourt int NOT NULL,
-	paid int);
+	fkCourt int NOT NULL);
 	
 CREATE TABLE bookingErrors(
 	idbooking int IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -74,7 +75,6 @@ CREATE TABLE bookingErrors(
 	
 CREATE TABLE config(
 	idconfig int IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	keygroupname varchar(15) NOT NULL,
 	keyname varchar(45) NOT NULL,
 	numval float NULL,
 	charval varchar(1000) NULL,
@@ -192,7 +192,6 @@ GO
 
 CREATE TABLE Users(
 	UserId uniqueidentifier NOT NULL,
-	UserNb int IDENTITY,
 	ApplicationId uniqueidentifier NOT NULL,
 	Firstname varchar(45) NULL,
 	LastName varchar(45) NULL,
@@ -314,9 +313,6 @@ INSERT INTO Applications (ApplicationId, ApplicationName) values (@baseappid,'/'
 INSERT INTO Users (UserId,FirstName, LastName, UserName, LastActivityDate, ApplicationId, IsAnonymous) values (NEWID(),'Radu','Albot','RuAlbot',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Nicolas','Almagro','NsAlmagro',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Kevin','Anderson','KnAnderson',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Guido','Andreozzi','GoAndreozzi',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Pablo','Andujar','PoAndujar',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Facundo','Arguello','FoArguello',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Andrea','Arnaboldi','AaArnaboldi',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Matthias','Bachinger','MsBachinger',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Marcos','Baghdatis','MsBaghdatis',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Facundo','Bagnis','FoBagnis',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Agut','Bautista','AtBautista',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Andreas','Beck','AsBeck',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Benjamin','Becker','BnBecker',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Aljaz','Bedene','AzBedene',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Thomaz','Bellucci','TzBellucci',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Ruben','Bemelmans','RnBemelmans',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Julien','Benneteau','JnBenneteau',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Ricardas','Berankis','RsBerankis',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Tomas','Berdych','TsBerdych',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Carlos','Berlocq','CsBerlocq',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Michael','Berrer','MlBerrer',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Simone','Bolelli','SeBolelli',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Alex','Bolt','AxBolt',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Liam','Broady','LmBroady',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Dustin','Brown','DnBrown',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Chase','Buchanan','CeBuchanan',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Baena','Carballes','BaCarballes',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Busta','Carreno','BaCarreno',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Marco','Cecchinato','MoCecchinato',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Jeremy','Chardy','JyChardy',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Marco','Chiudinelli','MoChiudinelli',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Hyeon','Chung','HnChung',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Marin','Cilic','MnCilic',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Marius','Copil','MsCopil',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Kimmer','Coppejans','KrCoppejans',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Borna','Coric','BaCoric',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Pablo','Cuevas','PoCuevas',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Frank','Dancevic','FkDancevic',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Taro','Daniel','ToDaniel',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Steve','Darcis','SeDarcis',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Jon','de Bakker','Jnde Bakker',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Marc','De Schepper','McDe Schepper',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Juan','Del Potro','JnDel Potro',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Federico','Delbonis','FoDelbonis',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Mate','Delic','MeDelic',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Somdev','Devvarman','SvDevvarman',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Grigor','Dimitrov','GrDimitrov',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Novak','Djokovic','NkDjokovic',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Ivan','Dodig','InDodig',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Alexandr','Dolgopolov','ArDolgopolov',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Evgeny','Donskoy','EyDonskoy',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'James','Duckworth','JsDuckworth',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Farrukh','Dustov','FhDustov',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Damir','Dzumhur','DrDzumhur',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Matthew','Ebden','MwEbden',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Gastao','Elias','GoElias',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Burgos','Estrella','BsEstrella',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Alejandro','Falla','AoFalla',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Roger','Federer','RrFederer',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'David','Ferrer','DdFerrer',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Fabio','Fognini','FoFognini',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Marton','Fucsovics','MnFucsovics',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Teymuraz','Gabashvili','TzGabashvili',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Guillermo','Garcia-Lopez','GoGarcia-Lopez',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Richard','Gasquet','RdGasquet',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Andre','Ghem','AeGhem',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Daniel','Gimeno-Traver','DlGimeno-Traver',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Santiago','Giraldo','SoGiraldo',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'David','Goffin','DdGoffin',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Peter','Gojowczyk','PrGojowczyk',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Andrey','Golubev','AyGolubev',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Norbert','Gombos','NtGombos',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Alejandro','Gonzalez','AoGonzalez',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Maximo','Gonzalez','MoGonzalez',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Marcel','Granollers','MlGranollers',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Sam','Groth','SmGroth',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Ernests','Gulbis','EsGulbis',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Tommy','Haas','TyHaas',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Robin','Haase','RnHaase',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Andreas','Haider-Maurer','AsHaider-Maurer',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Victor','Hanescu','VrHanescu',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Ryan','Harrison','RnHarrison',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Pierre-Hugues','Herbert','PsHerbert',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Lleyton','Hewitt','LnHewitt',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Galung','Huta','GgHuta',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Uladzimir','Ignatik','UrIgnatik',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Marsel','Ilhan','MlIlhan',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'John','Isner','JnIsner',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Denis','Istomin','DsIstomin',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Tatsuma','Ito','TaIto',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Jerzy','Janowicz','JyJanowicz',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Malek','Jaziri','MkJaziri',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Steve','Johnson','SeJohnson',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Tobias','Kamke','TsKamke',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Ivo','Karlovic','IoKarlovic',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Blaz','Kavcic','BzKavcic',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Bradley','Klahn','ByKlahn',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Martin','Klizan','MnKlizan',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Philipp','Kohlschreiber','PpKohlschreiber',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Thanasi','Kokkinakis','TiKokkinakis',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Austin','Krajicek','AnKrajicek',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Filip','Krajinovic','FpKrajinovic',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Jason','Kubler','JnKubler',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Lukasz','Kubot','LzKubot',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Denis','Kudla','DsKudla',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Alexander','Kudryavtsev','ArKudryavtsev',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Mikhail','Kukushkin','MlKukushkin',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Andrey','Kuznetsov','AyKuznetsov',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Alex','Kuznetsov','AxKuznetsov',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Nick','Kyrgios','NkKyrgios',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Lukas','Lacko','LsLacko',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Dusan','Lajovic','DnLajovic',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Feliciano','Lopez','FoLopez',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Paolo','Lorenzi','PoLorenzi',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Yen-Hsun','Lu','YnLu',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Nicolas','Mahut','NsMahut',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Adrian','Mannarino','AnMannarino',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Illya','Marchenko','IaMarchenko',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Andrej','Martin','AjMartin',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Paul-Henri','Mathieu','PiMathieu',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Marinko','Matosevic','MoMatosevic',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Leonardo','Mayer','LoMayer',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Florian','Mayer','FnMayer',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'James','McGee','JsMcGee',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Miloslav','Mecir','MvMecir',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Jurgen','Melzer','JnMelzer',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Gerald','Melzer','GdMelzer',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Adrian','Menendez-Maceiras','AnMenendez-Maceiras',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Axel','Michon','AlMichon',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'John','Millman','JnMillman',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Vincent','Millot','VtMillot',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Denys','Molchanov','DsMolchanov',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Juan','Monaco','JnMonaco',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Gael','Monfils','GlMonfils',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Albert','Montanes','AtMontanes',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Hiroki','Moriya','HiMoriya',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Gilles','Muller','GsMuller',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Andy','Murray','AyMurray',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Rafael','Nadal','RlNadal',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Aleksandr','Nedovyesov','ArNedovyesov',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Jarkko','Nieminen','JoNieminen',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Kei','Nishikori','KiNishikori',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Yoshihito','Nishioka','YoNishioka',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Wayne','Odesnik','WeOdesnik',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Benoit','Paire','BtPaire',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Ante','Pavic','AePavic',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Peter','Polansky','PrPolansky',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Vasek','Pospisil','VkPospisil',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Lucas','Pouille','LsPouille',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Michal','Przysiezny','MlPrzysiezny',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Tim','Puetz','TmPuetz',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Sam','Querrey','SmQuerrey',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Rajeev','Ram','RvRam',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Albert','Ramos-Vinolas','AtRamos-Vinolas',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Milos','Raonic','MsRaonic',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Julian','Reister','JnReister',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Pere','Riba','PeRiba',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Stephane','Robert','SeRobert',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Tommy','Robredo','TyRobredo',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Edouard','Roger-Vasselin','EdRoger-Vasselin',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Blaz','Rola','BzRola',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Lukas','Rosol','LsRosol',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Michael','Russell','MlRussell',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Luke','Saville','LeSaville',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Diego','Schwartzman','DoSchwartzman',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Dudi','Sela','DiSela',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Andreas','Seppi','AsSeppi',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Igor','Sijsling','IrSijsling',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Gilles','Simon','GsSimon',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'John-Patrick','Smith','JkSmith',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Tim','Smyczek','TmSmyczek',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Jack','Sock','JkSock',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Go','Soeda','GoSoeda',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Joao','Sousa','JoSousa',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Joao','Souza','JoSouza',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Sergiy','Stakhovsky','SyStakhovsky',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Potito','Starace','PoStarace',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Radek','Stepanek','RkStepanek',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Jan-Lennard','Struff','JdStruff',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Yuichi','Sugita','YiSugita',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Dominic','Thiem','DcThiem',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Bernard','Tomic','BdTomic',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Stefano','Travaglia','SoTravaglia',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Viktor','Troicki','VrTroicki',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Jo-Wilfried','Tsonga','JdTsonga',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Dmitry','Tursunov','DyTursunov',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Adrian','Ungur','AnUngur',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Luca','Vanni','LaVanni',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Fernando','Verdasco','FoVerdasco',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Jiri','Vesely','JiVesely',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Matteo','Viola','MoViola',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Filippo','Volandri','FoVolandri',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Jimmy','Wang','JyWang',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'James','Ward','JsWard',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Stan','Wawrinka','SnWawrinka',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Donald','Young','DdYoung',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Mikhail','Youzhny','MlYouzhny',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Horacio','Zeballos','HoZeballos',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Ze','Zhang','ZeZhang',CURRENT_TIMESTAMP,@baseappid,0),(NEWID(),'Alexander','Zverev','ArZverev',CURRENT_TIMESTAMP,@baseappid,0);
 GO
 
-INSERT INTO config (keygroupname, keyname, charval) VALUES ('StatType','TypeDesc','Invitations'),('StatType','TypeDesc','Faites'),('StatType','TypeDesc','Reçues')
-GO
-
 INSERT INTO court (courtName) VALUES ('Central'), ('Numéro 1'), ('Numéro 2');
 GO
 
@@ -335,12 +331,12 @@ INSERT INTO belongs (fkMember, fkGroup, fkRole, since) VALUES
 		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),4,5,CURRENT_TIMESTAMP), -- Comité/Membre
 		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),4,1,CURRENT_TIMESTAMP), -- Comité/Président
 		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),4,4,CURRENT_TIMESTAMP), -- Comité/Caissier
-		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,1,CURRENT_TIMESTAMP), -- Interclubs/Membre
-		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,1,CURRENT_TIMESTAMP), -- Interclubs/Membre
-		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,1,CURRENT_TIMESTAMP), -- Interclubs/Membre
-		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,1,CURRENT_TIMESTAMP), -- Interclubs/Membre
-		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,1,CURRENT_TIMESTAMP), -- Interclubs/Membre
-		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,1,CURRENT_TIMESTAMP), -- Interclubs/Membre
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,5,CURRENT_TIMESTAMP), -- Interclubs/Membre
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,5,CURRENT_TIMESTAMP), -- Interclubs/Membre
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,5,CURRENT_TIMESTAMP), -- Interclubs/Membre
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,5,CURRENT_TIMESTAMP), -- Interclubs/Membre
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,5,CURRENT_TIMESTAMP), -- Interclubs/Membre
+		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,5,CURRENT_TIMESTAMP), -- Interclubs/Membre
 		((SELECT TOP 1 UserId FROM Users ORDER BY NEWID()),3,2,CURRENT_TIMESTAMP); -- Interclubs/Entraîneur
 GO
 
@@ -348,47 +344,39 @@ INSERT INTO NPA (NPAVal,City) VALUES (1000, 'Lausanne CT'),(1001, 'Lausanne'),(1
 GO
 
 Declare @zeday datetime = GETDATE(),
-		@nbdays integer = 0,
-		@nres integer = 0,
-		@court integer = 0,
-		@hour integer = 0,
+		@nbdays integer,
+		@nres integer,
+		@court integer,
+		@hour integer,
 		@moment datetime,
-		@nbres integer = 0,
-		@madeByint integer = 0,
-		@partnerint integer = 0,
+		@nbres integer,
 		@madeBy uniqueidentifier,
-		@partner uniqueidentifier,
-		@paid int = 0;
+		@partner uniqueidentifier;
 
-Set @zeday = CAST('2014-04-01' AS DATETIME);
+Set @zeday = DATEADD(MONTH,-2,@zeday); -- We will create bookings from two months in the past
+Set @zeday = CAST(CAST(DATEPART(YEAR,@zeday) AS varchar) + '-' + CAST(DATEPART(MONTH,@zeday) AS varchar) + '-' + CAST(DATEPART(DAY,@zeday) AS varchar) AS DATETIME);
 
 Set @nbdays = 0;
-While @zeday < CAST('2014-10-31' AS DATETIME) -- Create bookings for the 2014 season
+While @zeday < DATEADD(WEEK,1,GETDATE()) -- Create bookings up to one week in the future
 Begin
-	Set @nbres = 13;
-	while @nbres > 0
+	Set @nbres = 8 + Round(Rand()*10,0);
+	Set @nres = 0;
+	while @nres < @nbres
 	Begin
-		Set @court = (@court % 3) + 1;
-		if @hour = 22
-			set @hour = 8
-		else
-			set @hour = @hour + 1
+		Set @court = Round(Rand()*2,0) + 1;
+		Set @hour = Round(Rand()*13,0) + 8;
 		Set @moment = DATEADD(HOUR,@hour,@zeday);
 		Begin Try
-			if @nres % 7 = 0 -- Guest only
-			Begin
-				set @paid = 0;
-				if (@nres % 9) > 0 set @paid = 1
-				Insert Into booking (moment,guest,fkCourt, paid) Values (@moment,(select Firstname from Users where UserNb = ((@nres + @nbres) * 13) % 200 + 1),@court, @paid);
-			End
+			if (Rand() < 0.1) -- Guest only
+				Insert Into booking (moment,guest,fkCourt) Values (@moment,'Invité',@court);
 			else
 			Begin
-				Set @madeBy = (Select UserId From Users Where UserNb = (@nres * 11) % 200 + 1 and LastName not in ('Murray','Berdych','MonFils','Seppi'));
-				if (@nres % 3 = 0) and @madeby is not null -- Member + Guest
-					Insert Into booking (moment,fkMadeBy,guest,fkCourt) Values (@moment,@madeBy,(select Firstname from Users where UserNb = ((@nres + @nbres) * 13) % 200 + 1),@court);
+				Set @madeBy = (Select Top 1 UserId From Users Order By NEWID());
+				if (Rand() < 0.2) -- Member + Guest
+					Insert Into booking (moment,fkMadeBy,guest,fkCourt) Values (@moment,@madeBy,'Invité',@court);
 				else -- Member + Member
 				Begin
-					Set @partner = (Select UserId From Users Where UserNb = (@nres * 17) % 200 + 1);
+					Set @partner = (Select Top 1 UserId From Users Order By NEWID());
 					Insert Into booking (moment,fkMadeBy,fkPartner,fkCourt) Values (@moment,@madeBy,@partner,@court);
 				End
 			End
@@ -397,7 +385,6 @@ Begin
 			Print ('Pas de bol');
 		End Catch
 
-		Set @nbres=@nbres-1;
 		Set @nres=@nres+1;
 	End
 
@@ -413,6 +400,220 @@ GO
 -------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
 
+-- CheckRes:	Verifies court bookings. Invalid bookings are reported in table booking_errors
+--				Validation of:
+--					1. Set of people involved
+--					2. Datetime between now and now+2 weeks
+--					3. Court availability
+-- Author:		X. Carrel
+-- Date:		Dec 2014
+
+Create Trigger CheckRes
+On booking
+Instead Of Insert, Update
+As
+Begin
+	Declare Resas Cursor For
+	Select idbooking, moment, fkMadeBy, fkPartner, guest, fkCourt From inserted;
+
+	Declare @idbooking int,
+			@moment Datetime,
+			@fkMadeBy uniqueidentifier,
+			@fkPartner uniqueidentifier,
+			@guest varchar(45),
+			@fkCourt int;
+
+	Declare @Error varchar(200)='',
+			@count int = 0,
+			@nbErrors int = 0;
+
+	Open Resas;
+	Fetch Next From Resas Into @idbooking, @moment, @fkMadeBy, @fkPartner, @guest, @fkCourt;
+
+	while @@FETCH_STATUS = 0
+	Begin
+		Set @count = @count+1;
+
+		-- Check people set
+		if @fkMadeBy is null
+			if @fkPartner is null
+				if @guest is null
+					Set @Error = 'Aucune référence à des joueurs';
+				else
+					Set @Error = '';-- No problem: guest only
+			else
+				Set @Error = 'Spécifier un membre principal avant un partenaire';
+		else -- Main member specified
+			if @fkPartner is null
+				if @guest is null
+					Set @Error = 'Pas de partenaire';
+				else
+					Set @Error = '';-- No problem: member and guest
+			else
+				if @guest is null
+					Set @Error = '';-- No problem: Two members
+				else
+					Set @Error = 'Trop de monde';
+
+		-- Check time
+		if DATEDIFF(DAY,GETDATE(),@moment) <0 Set @Error='Date dans le passé';
+		if DATEDIFF(DAY,GETDATE(),@moment) >15 Set @Error='Date trop loin dans le futur';
+
+		-- Check fk
+		if @fkMadeBy is not null AND not exists (Select * From Users where UserId = @fkMadeBy) Set @Error = 'Joueur inconnu';
+		if @fkPartner is not null AND not exists (Select * From Users where UserId = @fkPartner) Set @Error = 'Partenaire inconnu';
+		if not exists (Select * From Court where idcourt = @fkCourt) Set @Error = 'Court inexistant';
+
+		-- Check court availability
+		if exists (Select * from booking  where DATEPART(YEAR,moment)=DATEPART(YEAR,@moment) AND
+												DATEPART(MONTH,moment)=DATEPART(MONTH,@moment) AND
+												DATEPART(DAY,moment)=DATEPART(DAY,@moment) AND
+												DATEPART(HOUR,moment)=DATEPART(HOUR,@moment) AND
+												fkCourt = @fkCourt)
+			Set @Error = 'Le court est pris';
+
+		-- Finalize
+		if @Error = '' -- No problem
+		Begin
+			print 'OK';
+			Insert Into booking(moment, fkMadeBy, fkPartner, guest, fkCourt)
+			Values (@moment, @fkMadeBy, @fkPartner, @guest, @fkCourt);
+		End
+		else
+		Begin
+			print 'Error: '+@Error;
+			Insert Into bookingErrors(moment, fkMadeBy, fkPartner, guest, fkCourt, reason)
+			Values (@moment, @fkMadeBy, @fkPartner, @guest, @fkCourt, @Error);
+			Set @nbErrors = @nbErrors+1;
+		End;
+
+		-- Move on to next record
+		Fetch Next From Resas Into @idbooking, @moment, @fkMadeBy, @fkPartner, @guest, @fkCourt;
+	End
+	Close Resas;
+	Deallocate Resas;
+
+	-- Return result
+	if @nbErrors > 0
+		if @nbErrors = @count
+		Begin
+			RAISERROR ('Tout faux',2,1);
+			Rollback;
+		End
+		else
+			RAISERROR ('Quelques soucis',1,1);
+End
+
+GO
+
+-- Committee:	Allows insert, deletes and updates in the "committee" view
+--				Specific constraint: there must always be one and only one "président"
+--				and one and only one "caissier"
+-- Author:		X. Carrel
+-- Date:		Dec 2014
+
+Create Trigger ValidateCommittee
+On Committee
+Instead Of Insert, Update, Delete
+As
+Begin
+	Declare @uname varchar(45), -- username
+			@rdesc varchar(45), -- role description
+			@uid uniqueidentifier, -- user id
+			@uidout uniqueidentifier, -- id of the user leaving a group
+			@rid int, -- role id
+			@rpres int, -- id of role "Président"
+			@rcais int, -- id of role "Caissier"
+			@cid int; -- id of group "Comité"
+
+	Select @rpres=idrole From [role] Where roleDescription='Président';
+	Select @rcais=idrole From [role] Where roleDescription='Caissier';
+	Select @cid=idClubGroup From clubGroup Where groupName = 'Comité';
+
+	-- Handle the special case: change of unique role
+	if ((select count(*) from inserted) = 1) And
+	   ((select count(*) from deleted) = 1) And
+	   ((select roleDescription from inserted) = (select roleDescription from deleted))
+	Begin
+		Select @uid=UserId From Users Where Username = (select UserName from inserted);
+		Select @uidout=UserId From Users Where Username = (select UserName from deleted);
+		Select @rid=idrole From [role] Where roleDescription=(select roleDescription from inserted);
+		update belongs set fkMember = @uid where fkMember=@uidout and fkGroup=@cid and fkRole=@rid
+		return
+	End
+
+	-- Handle inserts				
+	Declare cursins Cursor For
+	Select UserName, roleDescription From inserted;
+
+	Open cursins;
+	Fetch Next From cursins Into @uname, @rdesc;
+
+	while @@FETCH_STATUS = 0
+	Begin
+		Select @uid=UserId From Users Where Username = @uname;
+		Select @rid=idrole From [role] Where roleDescription=@rdesc;
+		
+		if @uid is not null and @rid is not null -- Input is correct
+		Begin
+			if @rid = @rpres or @rid = @rcais
+			Begin
+				RAISERROR ('Duplication de fonction interdite',1,1);
+				Rollback;
+			End
+			Else
+			Begin
+				Insert Into belongs (fkMember, fkGroup, fkRole, since) Values
+									(@uid,@cid,@rid,CURRENT_TIMESTAMP)
+			End
+		End
+		Else
+			RAISERROR ('Données incorrectes',1,1);
+
+		-- Move on to next record
+		Fetch Next From cursins Into @uname, @rdesc;
+	End
+			
+	Close cursins;
+	Deallocate cursins;
+
+	-- Handle deletes				
+	Declare cursdel Cursor For
+	Select UserName, roleDescription From deleted;
+
+	Open cursdel;
+	Fetch Next From cursdel Into @uname, @rdesc;
+
+	while @@FETCH_STATUS = 0
+	Begin
+		Select @uid=UserId From Users Where Username = @uname;
+		Select @rid=idrole From [role] Where roleDescription=@rdesc;
+		
+		if @uid is not null and @rid is not null -- Input is correct
+		Begin
+			if @rid = @rpres or @rid = @rcais
+			Begin
+				RAISERROR ('Suppression de fonction interdite',1,1);
+				Rollback;
+			End
+			Else
+			Begin
+				Delete From belongs Where fkMember =  @uid And fkRole = @rid And fkGroup = @cid
+			End
+		End
+		Else
+			RAISERROR ('Données incorrectes',1,1);
+			
+		-- Move on to next record
+		Fetch Next From cursdel Into @uname, @rdesc;
+	End
+	Close cursdel;
+	Deallocate cursdel;
+	
+End
+
+GO
+
 -- NewUser:		Creates the tccmembership record that will hold the tcc-specific data
 -- Author:		X. Carrel
 -- Date:		Dec 2014
@@ -421,12 +622,481 @@ On Users
 After Insert
 As
 Begin
-	Declare @isadmin int = 0
-	if (select UserName from inserted) = 'admin' set @isadmin = 1
-	Declare @uid uniqueidentifier = (select UserId from inserted)
-
-	Insert Into tccmembership (fkuser, isSiteAdmin) values (@uid, @isadmin);
+	Insert Into tccmembership (fkuser) Select UserId From inserted;
 End
 
 GO
+
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+-- Procedures
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+-- MemberMemberBooking:	Creates a booking involving two members
+-- Author:				X. Carrel
+-- Date:				Dec 2014
+
+CREATE PROCEDURE MemberMemberBooking (@m1 varchar(45), @m2 varchar(45), @court varchar(45), @moment datetime)
+AS
+Begin
+	Declare @u1 uniqueidentifier,
+			@u2 uniqueidentifier,
+			@cid int;
+
+	Set @u1 = (Select UserId From Users Where UserName = @m1);
+	Set @u2 = (Select UserId From Users Where LastName = @m2);
+	Set @cid = (Select idCourt From court Where courtName = @court);
+
+	If (@u1 is null or @u2 is null)
+		RAISERROR ('Unknown member',16,1);
+	Else
+		If @cid is null
+			RAISERROR ('Unknown court',16,1);
+		Else
+			if DATEDIFF(DAY,GETDATE(),@moment) <0 
+				RAISERROR ('Date in the past',16,1);
+			Else
+				if DATEDIFF(DAY,GETDATE(),@moment) >15 
+					RAISERROR ('Date too far in the future',16,1);
+				Else
+					if exists (Select * from booking  where DATEPART(YEAR,moment)=DATEPART(YEAR,@moment) AND
+															DATEPART(MONTH,moment)=DATEPART(MONTH,@moment) AND
+															DATEPART(DAY,moment)=DATEPART(DAY,@moment) AND
+															DATEPART(HOUR,moment)=DATEPART(HOUR,@moment) AND
+															fkCourt = @cid)
+						RAISERROR ('Court is busy',16,1);
+					Else
+						Insert into booking (moment, fkMadeBy, fkPartner, fkCourt) Values (@moment, @u1, @u2, @cid);
+
+End
+
+GO
+-- MemberGuestBooking:	Creates a booking involving a member and a guest
+-- Author:				X. Carrel
+-- Date:				Jan 2015
+
+CREATE PROCEDURE MemberGuestBooking (@member varchar(45), @guest varchar(45), @court varchar(45), @moment datetime)
+AS
+Begin
+	Declare @u uniqueidentifier,
+			@cid int;
+
+	Set @u = (Select UserId From Users Where UserName = @member);
+	Set @cid = (Select idCourt From court Where courtName = @court);
+
+	If (@u is null)
+		RAISERROR ('Unknown member',16,1);
+	Else
+		If @cid is null
+			RAISERROR ('Unknown court',16,1);
+		Else
+			if DATEDIFF(DAY,GETDATE(),@moment) <0 
+				RAISERROR ('Date in the past',16,1);
+			Else
+				if DATEDIFF(DAY,GETDATE(),@moment) >15 
+					RAISERROR ('Date too far in the future',16,1);
+				Else
+					if exists (Select * from booking  where DATEPART(YEAR,moment)=DATEPART(YEAR,@moment) AND
+															DATEPART(MONTH,moment)=DATEPART(MONTH,@moment) AND
+															DATEPART(DAY,moment)=DATEPART(DAY,@moment) AND
+															DATEPART(HOUR,moment)=DATEPART(HOUR,@moment) AND
+															fkCourt = @cid)
+						RAISERROR ('Court is busy',16,1);
+					Else
+						Insert into booking (moment, fkMadeBy, guest, fkCourt) Values (@moment, @u, @guest, @cid);
+
+End
+
+GO
+-- GuestBooking:		Creates a booking involving only a guest
+-- Author:				X. Carrel
+-- Date:				Jan 2015
+
+CREATE PROCEDURE GuestBooking (@guest varchar(45), @court varchar(45), @moment datetime)
+AS
+Begin
+	Declare @cid int;
+
+	Set @cid = (Select idCourt From court Where courtName = @court);
+
+	If @cid is null
+		RAISERROR ('Unknown court',16,1);
+	Else
+		if DATEDIFF(DAY,GETDATE(),@moment) <0 
+			RAISERROR ('Date in the past',16,1);
+		Else
+			if DATEDIFF(DAY,GETDATE(),@moment) >15 
+				RAISERROR ('Date too far in the future',16,1);
+			Else
+				if exists (Select * from booking  where DATEPART(YEAR,moment)=DATEPART(YEAR,@moment) AND
+														DATEPART(MONTH,moment)=DATEPART(MONTH,@moment) AND
+														DATEPART(DAY,moment)=DATEPART(DAY,@moment) AND
+														DATEPART(HOUR,moment)=DATEPART(HOUR,@moment) AND
+														fkCourt = @cid)
+					RAISERROR ('Court is busy',16,1);
+				Else
+					Insert into booking (moment, guest, fkCourt) Values (@moment, @guest, @cid);
+
+End
+
+GO
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+-- GroupBooking:		Creates a booking for a group
+-- Author:				X. Carrel
+-- Date:				Jan 2015
+
+CREATE PROCEDURE GroupBooking (@m1 varchar(45), @court int, @moment datetime)
+AS
+Begin
+	Alter Table booking Disable Trigger CheckRes -- A group booking can go farther than a member's
+
+	Declare @u1 uniqueidentifier;
+
+	Set @u1 = (Select UserId From Users Where UserName = @m1);
+
+	if DATEDIFF(DAY,GETDATE(),@moment) <0 
+		RAISERROR ('Date in the past',16,1);
+	Else
+		if exists (Select * from booking  where DATEPART(YEAR,moment)=DATEPART(YEAR,@moment) AND
+												DATEPART(MONTH,moment)=DATEPART(MONTH,@moment) AND
+												DATEPART(DAY,moment)=DATEPART(DAY,@moment) AND
+												DATEPART(HOUR,moment)=DATEPART(HOUR,@moment) AND
+												fkCourt = @court)
+			RAISERROR ('Court is busy',16,1);
+		Else
+			Insert into booking (moment, fkMadeBy, fkPartner, fkCourt) Values (@moment, @u1, @u1, @court);
+
+	Alter Table booking Enable Trigger CheckRes -- Restore state
+End
+
+GO
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+-- Functions
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+-- Occupation:		Returns the occupation rate of a court between two dates
+-- Author:			X. Carrel
+-- Date:			Dec 2014
+
+CREATE FUNCTION Occupation (@court varchar(45), @from datetime, @to datetime)
+RETURNS int
+AS
+Begin
+	Declare @cid int,
+			@nbres float,
+			@nbhours float;
+
+	Set @cid = (Select idCourt From court Where courtName = @court);
+
+	If (@cid is null) 
+		Return -1; -- Error code for bad court
+
+	-- Beware of bad hours
+	If @to <= @from or DatePart(HOUR,@from) < 8 or DatePart(HOUR,@from) > 21 or DatePart(HOUR,@to) < 8 or DatePart(HOUR,@to) > 21 
+		Return -2; -- Error code for bad dates
+
+	Select @nbres = count(*) from booking Where fkCourt = @cid And moment >= @from And moment <= @to;
+	Set @nbhours = Datediff(DAY,@from,@to) * 14 + DatePart(HOUR,@to) - DatePart(HOUR,@from);
+
+	return Round(@nbres/@nbhours*100,0);
+
+End
+
+GO
+
+CREATE FUNCTION FrequentPlayers (@interval int, @from datetime, @to datetime)
+RETURNS @result TABLE (Member Varchar(45))
+AS
+-- Function FrequentPlayers returns a table that lists the users who have played (= been referenced in a booking)
+-- more than once in @interval days
+-- Author: X. Carrel
+-- Date: January 2015
+Begin
+	if @interval < 0 OR @interval > 6
+		set @interval = 'Invalid interval value' -- Ugly trick to report error: intentional runtime error (bad cast). Have to use it since Raiserror and Try/Catch are not allowed in function
+
+	Declare @tempresult TABLE (Member Varchar(45))
+	Declare @uname varchar(45)
+	Declare @moment datetime
+	Declare @prevuname varchar(45)
+	Declare @prevmoment datetime
+	Declare resalist cursor for
+		Select Lastname as Member, moment from booking INNER JOIN Users ON fkMadeBy = UserId Where moment >= @from And moment <= @to -- Member who made a booking
+		union
+		Select Lastname as Member, moment from booking INNER JOIN Users ON fkPartner = UserId Where moment >= @from And moment <= @to -- Members who partnered in a booking
+
+	Open resalist;
+	Fetch Next From resalist Into @uname, @moment;
+
+	while @@FETCH_STATUS = 0
+	Begin
+		set @prevuname = @uname -- Save values of previous record for comparison
+		set @prevmoment = @moment
+		-- Move on to next record
+		Fetch Next From resalist Into @uname, @moment;
+		if @uname = @prevuname AND DATEDIFF(DAY,@prevmoment,@moment) <= @interval
+			insert into @tempresult Values (@uname)
+	End
+	Close resalist;
+	Deallocate resalist;
+	insert into @result select distinct Member from @tempresult -- Distinct to remove doubles
+	return 
+End
+
+GO
+
+Create Procedure InsertDummyRecord @TName varchar(50) As
+-- Procedure InsertDummyRecord takes the name of a table, builds and
+-- executes an insert statement for a single record in that table.
+-- It assumes referential and domain constraints are disabled
+-- Author: X. Carrel
+-- Date: January 2014
+Begin
+	Declare @ColName Varchar(50), @DataType Varchar(50)
+	-- Read the table's fields: all except the identity one (if any)
+	Declare Fields Cursor For
+		select COLUMN_NAME,DATA_TYPE from information_schema.columns
+		where table_name = @TName and COLUMN_NAME not in 
+			(SELECT name FROM syscolumns WHERE OBJECT_NAME(id) = @TName	AND COLUMNPROPERTY(id, name, 'IsIdentity') = 1)
+	Open Fields
+	
+	Declare @FirstCol int = 1
+	Declare @FieldList as varchar(200) = ''
+	Declare @Values as varchar(1000) = ''
+	Fetch Next From Fields Into @ColName, @DataType -- Initiate the pump
+	While @@FETCH_STATUS = 0
+	Begin
+		If @FirstCol = 1
+		Begin
+			Set @FieldList = '('
+			Set @Values = '('
+		End
+		Else
+		Begin
+			Set @FieldList = @FieldList+','
+			Set @Values = @Values+','
+		End
+		Set @FieldList = @FieldList+@ColName
+		-- Format data values according to column data type
+		If @DataType in ('int','smallint','bigint')
+			Set @Values=@Values+ Convert(varchar,round(rand() * 100,0)) 
+		If @DataType in ('float','double')
+			Set @Values=@Values+ Convert(varchar,rand() * 100)
+		If @DataType in ('varchar','nvarchar','char')
+			Set @Values=@Values+'''dummy'''
+		If @DataType in ('Date','Time','datetime')
+			Set @Values=@Values+''''+Convert(varchar,GETDATE())+''''
+
+		Fetch Next From Fields Into @ColName, @DataType
+		Set @FirstCol = 0
+	End	
+	if @FieldList <> '' -- There are fields we can insert into
+	Begin
+		Declare @InsertSQL nvarchar(1000) = 'Insert Into '+@TName+@FieldList+') Values '+@Values+')'
+		Exec sp_executesql @InsertSQL
+		if @@ERROR <> 0 print @InsertSQL
+	End
+	Else
+		print 'I can''t do anything on table '+@TName
+		
+	-- Cleaning up
+	Close Fields
+	Deallocate Fields
+End
+
+GO
+
+Create Procedure InsertDummyRecords @TName varchar(50), @nb int As
+-- Procedure InsertTestData takes the name of a table, builds and
+-- executes an insert statement for @nb records in that table.
+-- It assumes referential and domain constraints are disabled
+-- Author: X. Carrel
+-- Date: January 2015
+Begin
+	Declare @ColName Varchar(50), @DataType Varchar(50)
+	-- Read the table's fields: all except the identity one (if any)
+	Declare Fields Scroll Cursor For
+		select COLUMN_NAME,DATA_TYPE from information_schema.columns
+		where table_name = @TName and COLUMN_NAME not in 
+			(SELECT name AS HasIdentity
+			FROM syscolumns
+			WHERE OBJECT_NAME(id) = @TName
+			AND COLUMNPROPERTY(id, name, 'IsIdentity') = 1)
+	Open Fields
+	
+	-- Build the field list
+	Declare @FirstCol int = 1
+	Declare @FieldList as varchar(200) = ''
+	Fetch First From Fields Into @ColName, @DataType -- Initiate the pump
+	While @@FETCH_STATUS = 0
+	Begin
+		If @FirstCol = 1
+			Set @FieldList = '('
+		Else
+			Set @FieldList = @FieldList+','
+		Set @FieldList = @FieldList+@ColName
+		Fetch Next From Fields Into @ColName, @DataType
+		Set @FirstCol = 0
+	End	
+
+	-- Build the VALUES list
+	Declare @Values as varchar(4000) = ''
+	Declare @FirstRec int = 1
+	While @nb > 0
+	Begin
+		Set @FirstCol = 1
+		Fetch First From Fields Into @ColName, @DataType -- rewind the cursor
+		While @@FETCH_STATUS = 0
+		Begin
+			If @FirstCol = 1
+				If @FirstRec = 1
+					Set @Values = '('
+				Else
+					Set @Values = @Values+'),('
+			Else
+				Set @Values = @Values+','
+
+			-- Format data values according to column data type
+			If @DataType in ('int','smallint','bigint')
+				Set @Values=@Values+ Convert(varchar,round(rand() * 100,0)) 
+			If @DataType in ('float','double')
+				Set @Values=@Values+ Convert(varchar,rand() * 100)
+			If @DataType in ('varchar','nvarchar','char')
+				Set @Values=@Values+'''dummy'''
+			If @DataType in ('Date','Time','datetime')
+				Set @Values=@Values+''''+Convert(varchar,GETDATE())+''''
+
+			Fetch Next From Fields Into @ColName, @DataType
+			Set @FirstCol = 0
+		End	
+		Set @FirstRec = 0
+		Set @nb = @nb-1
+	End
+
+	if @FieldList <> '' -- There are fields we can insert into
+	Begin
+		Declare @InsertSQL nvarchar(1000) = 'Insert Into '+@TName+@FieldList+') Values '+@Values+')'
+		Exec sp_executesql @InsertSQL
+		if @@ERROR <> 0 print @InsertSQL
+	End
+	Else
+		print 'I can''t do anything on table '+@TName
+		
+	-- Cleaning up
+	Close Fields
+	Deallocate Fields
+End
+
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+-- Security
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+GO
+
+if SUSER_NAME() <> 'sa'
+	print 'Login is not sa -> skip security stuff'
+else
+Begin
+	print 'Login is sa -> perform security stuff'
+	Use Master
+
+	-- Eliminate all WINDOWS and SQL logins
+
+	Declare @lname varchar(50)
+	Declare @sql nvarchar(1000)
+	Declare Logins cursor for
+		SELECT name FROM sys.server_principals
+		WHERE (type_desc = 'SQL_LOGIN' AND name not like '##%' AND name <> 'sa') -- SQL logins, save system ones
+		   -- OR (type_desc = 'WINDOWS_LOGIN' AND name not like 'NT %')-- Windows logins, save system ones
+
+	Open Logins
+	Fetch Next From Logins Into @lname
+	While @@FETCH_STATUS = 0
+	Begin
+		set @sql = 'DROP LOGIN [' + @lname + ']' -- Brackets in case there are special chars in the name
+		EXEC sp_executesql @sql
+		Fetch Next From Logins Into @lname
+	End
+	Close Logins
+	Deallocate Logins
+
+	-- Create a guest login
+	-- Guests can only select from court and bookings
+
+	Use TCCXCL
+
+	CREATE LOGIN guest WITH PASSWORD = 'guest', DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF;
+	CREATE USER TCCguest FOR LOGIN guest;
+	GRANT SELECT ON court TO TCCguest;
+	GRANT SELECT ON booking TO TCCguest;
+
+	-- Create a view so that guests can see the names associated to bookings
+	set @sql = '
+	Create View BookingsForGuests AS
+		Select Lastname as Member, moment, courtName from booking INNER JOIN Users ON fkMadeBy = UserId INNER JOIN court ON fkCourt = idcourt
+			union
+		Select Lastname as Member, moment, courtName from booking INNER JOIN Users ON fkPartner = UserId INNER JOIN court ON fkCourt = idcourt'
+
+	exec sp_executesql @sql -- Use execute because direct execution requires TSQL batches (GO)
+
+	GRANT SELECT ON BookingsForGuests to TCCguest
+
+	-- Create individual logins for multiple TCCAdmins
+	CREATE LOGIN Joe WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
+	CREATE LOGIN Jack WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
+	CREATE LOGIN William WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
+	CREATE LOGIN Averell WITH PASSWORD = 'change-me' MUST_CHANGE, DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = ON, CHECK_EXPIRATION = ON ;
+
+	-- Create users
+	CREATE USER Joe FOR LOGIN Joe;
+	CREATE USER Jack FOR LOGIN Jack;
+	CREATE USER William FOR LOGIN William;
+	CREATE USER Averell FOR LOGIN Averell;
+
+	-- Create a role
+	CREATE ROLE TCCAdmin
+
+	-- Add users in the role
+	EXEC sp_addrolemember 'TCCAdmin', 'Joe';
+	EXEC sp_addrolemember 'TCCAdmin', 'Jack';
+	EXEC sp_addrolemember 'TCCAdmin', 'William';
+	EXEC sp_addrolemember 'TCCAdmin', 'Averell';
+
+	-- Grant permissions to role
+	EXEC sp_addrolemember 'db_datareader', 'TCCAdmin';
+	EXEC sp_addrolemember 'db_datawriter', 'TCCAdmin';
+
+	-- Customize certain users
+	DENY UPDATE, DELETE, INSERT ON court TO Averell
+	DENY UPDATE, DELETE, INSERT ON Users TO Averell
+	GRANT UPDATE ON Users (FirstName, LastName) TO Averell
+
+	GRANT CREATE VIEW TO William
+	GRANT ALTER ON SCHEMA::dbo TO William
+
+	EXEC sp_addrolemember 'db_owner', 'Joe';
+
+	-- Create Login/User for the application
+	CREATE LOGIN TCCApp WITH PASSWORD = '1q2w3e4r', DEFAULT_DATABASE = TCCXCL, CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF ;
+	CREATE USER TCCApp FOR LOGIN TCCApp;
+	EXEC sp_addrolemember 'db_datareader', 'TCCApp';
+	EXEC sp_addrolemember 'db_datawriter', 'TCCApp';
+
+End
+
+GO
+
+--------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
+--**********************************************************************************************************--
+--*                                       Evaluation du module SQL2                                        *--
+--*                                                                                                        *--
+--*                      Ajoutez le code répondant aux énoncés d'exercices ci-dessous                      *--
+--*                                                                                                        *--
+--**********************************************************************************************************--
+--------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
 
