@@ -529,7 +529,11 @@ On Users
 After Insert
 As
 Begin
-	Insert Into tccmembership (fkuser) Select UserId From inserted;
+	Declare @isadmin int = 0
+	if (select UserName from inserted) = 'admin' set @isadmin = 1
+	Declare @uid uniqueidentifier = (select UserId from inserted)
+
+	Insert Into tccmembership (fkuser, isSiteAdmin) values (@uid, @isadmin);
 End
 
 GO
